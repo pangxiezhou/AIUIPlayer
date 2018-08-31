@@ -1,0 +1,1 @@
+include ':app', ':player_core', ':player_auth', ':player_init'
