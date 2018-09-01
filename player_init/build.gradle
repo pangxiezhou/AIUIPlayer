@@ -27,9 +27,11 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    externalNativeBuild {
-        cmake {
-            path 'CMakeLists.txt'
+    if(!file("src/main/jniLibs").exists()) {
+        externalNativeBuild {
+            cmake {
+                path 'CMakeLists.txt'
+            }
         }
     }
 
