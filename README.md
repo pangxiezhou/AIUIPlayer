@@ -43,7 +43,7 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 
 ### 3.1 项目配置
 
-在顶层目录下的build.gradle中加入jitPack仓库
+在顶层目录下的build.gradle中加入jitPack仓库和蜻蜓FM的maven仓库
 
 ``` groovy
 allprojects {
@@ -51,6 +51,10 @@ allprojects {
         ......
         maven {
             url uri('https://jitpack.io')
+        }
+
+        maven {
+            url uri('http://maven.qingting.fm/')
         }
     }
 }
@@ -61,7 +65,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.1'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.3'
 }
 ```
 
@@ -95,4 +99,4 @@ dependencies {
         }
 ```
 
-更详细的调用参考app目录下代码示例。
+更详细的调用参考sample目录下代码示例。
