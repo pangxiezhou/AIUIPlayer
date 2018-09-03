@@ -18,9 +18,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        player.initialize()
+
         player.addListener(object : PlayerListener {
             override fun onPlayerReady() {
+                titleTxt.text = "初始化成功"
                 startPlaySamples()
             }
 
@@ -37,9 +38,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPlayerRelease() {
+                titleTxt.text = "未初始化"
             }
 
         })
+
+        initializeBtn.setOnClickListener {
+            player.initialize()
+        }
+
+        releaseBtn.setOnClickListener {
+            player.release()
+        }
+
 
         PreBtn.setOnClickListener {
             if (!player.previous()) {

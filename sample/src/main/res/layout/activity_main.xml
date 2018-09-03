@@ -25,7 +25,35 @@
                 android:gravity="center"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
+                android:text="@string/uninitialize_tip"
                 android:inputType="textPersonName" />
+
+            <LinearLayout
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/grey"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/initializeBtn"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/initialize_tip" />
+
+                <Button
+                    android:id="@+id/releaseBtn"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/release_tip" />
+
+            </LinearLayout>
 
             <LinearLayout
                 style="?android:attr/buttonBarStyle"
