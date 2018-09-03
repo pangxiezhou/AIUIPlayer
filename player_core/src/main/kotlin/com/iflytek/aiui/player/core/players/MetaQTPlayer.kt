@@ -1,17 +1,17 @@
 package com.iflytek.aiui.player.core.players
 
 import fm.qingting.qtsdk.QTSDK
-import fm.qingting.qtsdk.play.ICallback
 import fm.qingting.qtsdk.play.QTPlay
 import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
 import com.iflytek.aiui.player.core.MetaInfo
 import com.iflytek.aiui.player.init.PlayerInitializer
+import fm.qingting.qtsdk.callbacks.QTCallback
 
 //蜻蜓FM初始化接口，方便测试需要
-typealias QTCallback = (QTPlayer) -> Unit
+typealias QTInitializeCallback = (QTPlayer) -> Unit
 
-typealias QTPlayerInitializer = (readyCallback: QTCallback) -> Unit
+typealias QTPlayerInitializer = (readyCallback: QTInitializeCallback) -> Unit
 
 
 /**
@@ -29,9 +29,11 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
             QTSDK.setHost("https://open.staging.qingting.fm")
             PlayerInitializer.initQTFM(context)
             QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
-            QTPlay.initial(ICallback { _, _ ->
-                it(QTSDK.getPlayer())
-                mQTSDKInitialized = true
+            QTPlay.initial(QTCallback { success, _ ->
+                if(success) {
+                    it(QTSDK.getPlayer())
+                    mQTSDKInitialized = true
+                }
             })
         } else {
             it(QTSDK.getPlayer())
