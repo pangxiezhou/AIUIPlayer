@@ -27,9 +27,6 @@ allprojects {
         maven {
             url uri('http://maven.qingting.fm/')
         }
-
-        maven { url 'https://jitpack.io' }
-
     }
 }
 
