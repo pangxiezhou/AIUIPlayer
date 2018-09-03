@@ -22,14 +22,20 @@ typealias QTPlayerInitializer = (readyCallback: QTCallback) -> Unit
 class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
     private var player: QTPlayer? = null
     private var mPlayState = QTPlayer.PlayState.NONE
+    private var mQTSDKInitialized = false
     private var initializer: QTPlayerInitializer = {
-        QTSDK.setHost("https://open.staging.qingting.fm")
-        PlayerInitializer.initQTFM(context)
-        QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
-        QTSDK.Debug = true
-        QTPlay.initial(ICallback { _, _ ->
+        //因为蜻蜓SDK目前不提供销毁接口，重复初始化报错，故只只初始化一次
+        if(!mQTSDKInitialized) {
+            QTSDK.setHost("https://open.staging.qingting.fm")
+            PlayerInitializer.initQTFM(context)
+            QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
+            QTPlay.initial(ICallback { _, _ ->
+                it(QTSDK.getPlayer())
+                mQTSDKInitialized = true
+            })
+        } else {
             it(QTSDK.getPlayer())
-        })
+        }
     }
 
     override fun initialize() {
