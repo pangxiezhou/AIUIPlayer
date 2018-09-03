@@ -1,1 +1,1 @@
-include ':app', ':player_core', ':player_auth', ':player_init'
+include ':sample', ':player_core', ':player_auth', ':player_init'
