@@ -65,7 +65,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.3'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.1'
 }
 ```
 
@@ -73,9 +73,9 @@ dependencies {
 
 ``` kotlin
     player = AIUIPlayer(this)
-    player.initialize()
     player.addListener(object : PlayerListener {
         override fun onPlayerReady() {
+            titleTxt.text = "初始化成功"
             startPlaySamples()
         }
 
@@ -90,8 +90,21 @@ dependencies {
             //根据播放项变化回调修改title内容
             titleTxt.text = item.title
         }
+
+        override fun onPlayerRelease() {
+            titleTxt.text = "未初始化"
+        }
+
     })
-    
+
+    initializeBtn.setOnClickListener {
+        player.initialize()
+    }
+
+    releaseBtn.setOnClickListener {
+        player.release()
+    }
+
     PreBtn.setOnClickListener {
             if (player.previous()) {
                 Toast.makeText(this, "当前已是第一首", Toast.LENGTH_LONG).show()
