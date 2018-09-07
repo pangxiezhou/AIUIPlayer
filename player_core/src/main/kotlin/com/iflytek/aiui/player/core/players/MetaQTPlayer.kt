@@ -55,19 +55,12 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
 
                 override fun onPlayStateChange(state: Int) {
                     when (state) {
-                        QTPlayer.PlayState.LOADING -> {
-                            stateChange(MetaState.LOADING)
-                        }
                         QTPlayer.PlayState.PLAYING -> {
-                            stateChange(MetaState.PLAYING)
-                            //维护pause状态，避免蜻蜓播放器Loading状态不pause的问题
-                            if(mPaused) {
-                                pause()
+                            if(state() == MetaState.LOADING || state() == MetaState.PLAYING) {
+                                stateChange(MetaState.PLAYING)
+                            } else {
+                                player?.pause()
                             }
-                        }
-
-                        QTPlayer.PlayState.PAUSED -> {
-                            stateChange(MetaState.PAUSED)
                         }
 
                         //播放完成
@@ -105,6 +98,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         }
 
         mPaused = false
+        stateChange(MetaState.LOADING)
         if (programID == -1) {
             player?.prepare(channelID)
         } else {
@@ -118,7 +112,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         if(state() == MetaState.PLAYING) {
             player?.pause()
         }
-        mPaused = true
+        stateChange(MetaState.PAUSED)
 
     }
 
@@ -126,7 +120,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         if(state() == MetaState.PAUSED) {
             player?.play()
         }
-        mPaused = false
+        stateChange(MetaState.PLAYING)
     }
 
     override fun release() {
