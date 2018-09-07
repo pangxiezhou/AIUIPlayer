@@ -30,16 +30,12 @@ enum class PlayState {
      * 列表播放完成状态，可调用resume或play，重新进入PLAYING
      */
     COMPLETE,
-    /**
-     * 停止状态，调用play重新播放
-     */
-    STOPPED,
 }
 
 /**
  * 播放器可接受的播放项
  */
-data class MetaInfo(val info: JSONObject, val service: String = "") {
+data class MetaInfo(val info: JSONObject, val service: String) {
     val source: String = info.optString("source")
     val title: String
     val author: String
@@ -242,7 +238,7 @@ class AIUIPlayer(context: Context) {
      * @param data 信源内容列表
      *
      */
-    fun play(data: JSONArray, service: String = ""):Boolean {
+    fun play(data: JSONArray, service: String):Boolean {
         if (data.length() == 0) return false
 
         val backActivePlayer = mActivePlayer
@@ -305,6 +301,7 @@ class AIUIPlayer(context: Context) {
             }
 
             PlayState.COMPLETE -> {
+                mIndex++
                 playToNextAvailable(false)
             }
         }
@@ -313,14 +310,12 @@ class AIUIPlayer(context: Context) {
     /**
      * 播放器停止，列表清空，状态恢复到STOPPED
      */
-    fun stop() {
-        if (mState != PlayState.STOPPED) {
-            onStateChange(PlayState.STOPPED)
-            mActivePlayer?.pause()
+    fun reset() {
+        onStateChange(PlayState.READY)
+        mActivePlayer?.pause()
 
-            mData.clear()
-            mIndex = -1
-        }
+        mData.clear()
+        mIndex = -1
     }
 
     /**
@@ -346,7 +341,7 @@ class AIUIPlayer(context: Context) {
      */
     fun release() {
         mInitialized = false
-        stop()
+        reset()
         mPlayers.forEach { it.release() }
     }
 
