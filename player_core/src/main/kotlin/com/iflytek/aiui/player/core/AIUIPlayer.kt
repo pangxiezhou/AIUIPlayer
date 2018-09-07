@@ -38,6 +38,10 @@ enum class PlayState {
      * 列表播放完成状态，可调用resume或play，重新进入PLAYING
      */
     COMPLETE,
+    /**
+     * 错误状态，需调用reset，重新进入READY状态
+     */
+    ERROR
 }
 
 /**
@@ -303,9 +307,11 @@ class AIUIPlayer(context: Context) {
      * 暂停播放
      */
     fun pause() {
-        if (mState == PlayState.PLAYING) {
-            onStateChange(PlayState.PAUSED)
-            mActivePlayer?.pause()
+        when(mState) {
+            PlayState.PLAYING,PlayState.LOADING -> {
+                onStateChange(PlayState.PAUSED)
+                mActivePlayer?.pause()
+            }
         }
     }
 
