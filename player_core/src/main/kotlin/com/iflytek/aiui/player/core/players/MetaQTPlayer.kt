@@ -71,10 +71,16 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
                         QTPlayer.PlayState.EOF -> {
                             stateChange(MetaState.COMPLETE)
                         }
+
+                        //播放源错误
+                        QTPlayer.PlayState.SOURCEFAIL -> {
+                            stateChange(MetaState.ERROR)
+                        }
                     }
 
                 }
             })
+            stateChange(MetaState.READY)
         }
 
     }
