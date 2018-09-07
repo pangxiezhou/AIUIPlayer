@@ -1,6 +1,7 @@
 package com.iflytek.aiui.player.core
 
 import android.content.Context
+import android.text.TextUtils
 import com.iflytek.aiui.player.core.players.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -38,14 +39,77 @@ enum class PlayState {
 /**
  * 播放器可接受的播放项
  */
-data class MetaInfo(val info: JSONObject) {
-    //TODO 覆盖更多情况的title提取
+data class MetaInfo(val info: JSONObject, val service: String = "") {
+    val source: String = info.optString("source")
     val title: String
-        get() = info.optString("name")
+    val author: String
+    val url: String
+
+    init {
+        val contentType = info.optInt("type", -1)
+        when (contentType) {
+            1 -> {
+                url = info.optString("url")
+                var tempTitle = info.optString("title")
+                if (TextUtils.isEmpty(tempTitle)) {
+                    tempTitle = info.optString("name")
+                }
+                title = tempTitle
+                author = ""
+            }
+
+            -1 -> {
+                when (service) {
+                    "joke" -> {
+                        title = info.optString("title")
+                        url = info.optString("mp3Url")
+                        author = ""
+                    }
+
+                    "radio" -> {
+                        title = info.optString("name")
+                        url = info.optString("url")
+                        author = ""
+                    }
+
+                    "musicX" -> {
+                        title = info.optString("songname")
+                        url = info.optString("audiopath")
+                        val singers = mutableListOf<String>()
+                        val singersJSONArray = info.optJSONArray("singernames")
+                        for(i in 0 until singersJSONArray.length()) {
+                            singers.add(singersJSONArray.optString(i))
+                        }
+                        author = singers.joinToString(",")
+                    }
+
+                    "story" -> {
+                        title = info.optString("name")
+                        url = info.optString("playUrl")
+                        author = ""
+                    }
+
+                    else -> {
+                        title = ""
+                        author = ""
+                        url = ""
+                    }
+                }
+
+            }
+
+            else -> {
+                title = ""
+                author = ""
+                url = ""
+            }
+        }
+    }
+
 
     override fun equals(other: Any?): Boolean {
-        return if(other is MetaInfo) {
-            info == other.info
+        return if (other is MetaInfo) {
+            info == other.info && service == other.service
         } else {
             false
         }
