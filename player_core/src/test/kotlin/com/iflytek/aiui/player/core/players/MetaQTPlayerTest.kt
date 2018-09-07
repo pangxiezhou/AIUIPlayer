@@ -72,28 +72,28 @@ class MetaQTPlayerTest {
     }
 
     @Test
-    fun play() {
-        assertTrue(player.play(MetaInfo(JSONObject(hashMapOf(
+    fun canDispose() {
+        assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123, 456"
         )), "story")))
 
-        assertTrue(player.play(MetaInfo(JSONObject(hashMapOf(
+        assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123"
         )), "story")))
 
-        assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "0.1, 0.54"
         )), "story")))
 
-        assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "playUrl" to "http://fake.url/test.mp3"
         )), "story")))
 
-        assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "resourceId" to "123, 456"
         )), "story")))

@@ -60,19 +60,19 @@ class MetaMediaPlayerTest {
     }
 
     @Test
-    fun play() {
+    fun canDispose() {
         val urlItem = constructItem(
                 "河马当保姆",
                 "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214"
         )
-        assertTrue(player.play(urlItem))
+        assertTrue(player.canDispose(urlItem))
 
         val qingtingItem = MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "name" to "河马当保姆",
                 "resourceId" to "123, 456"
         )), "story")
-        assertFalse(player.play(qingtingItem))
+        assertFalse(player.canDispose(qingtingItem))
 
         val mixItem = MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
@@ -80,7 +80,7 @@ class MetaMediaPlayerTest {
                 "playUrl" to "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214",
                 "resourceId" to "123, 456"
         )), "story")
-        assertFalse(player.play(mixItem))
+        assertFalse(player.canDispose(mixItem))
     }
 
     @Test

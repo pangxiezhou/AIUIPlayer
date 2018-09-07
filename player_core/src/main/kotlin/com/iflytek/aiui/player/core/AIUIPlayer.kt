@@ -85,7 +85,7 @@ data class MetaInfo(val info: JSONObject, val service: String) {
                         url = info.optString("audiopath")
                         val singers = mutableListOf<String>()
                         val singersJSONArray = info.optJSONArray("singernames")
-                        for(i in 0 until singersJSONArray.length()) {
+                        for (i in 0 until singersJSONArray.length()) {
                             singers.add(singersJSONArray.optString(i))
                         }
                         author = singers.joinToString(",")
@@ -219,7 +219,7 @@ class AIUIPlayer(context: Context) {
                         }
 
                         MetaState.PLAYING -> {
-                            if(mState == PlayState.LOADING) {
+                            if (mState == PlayState.LOADING) {
                                 onStateChange(PlayState.PLAYING)
                             }
                         }
@@ -231,13 +231,13 @@ class AIUIPlayer(context: Context) {
                         }
 
                         MetaState.ERROR -> {
-                            if(mAutoSkipError) {
-                                if(positiveDirection) {
+                            if (mAutoSkipError) {
+                                if (positiveDirection) {
                                     if (!next()) {
                                         onStateChange(PlayState.ERROR)
                                     }
                                 } else {
-                                    if(!previous()) {
+                                    if (!previous()) {
                                         onStateChange(PlayState.ERROR)
                                     }
                                 }
@@ -267,7 +267,7 @@ class AIUIPlayer(context: Context) {
      * @param data 信源内容列表
      *
      */
-    fun play(data: JSONArray, service: String, autoSkip: Boolean = true):Boolean {
+    fun play(data: JSONArray, service: String, autoSkip: Boolean = true): Boolean {
         if (data.length() == 0) return false
 
         val backActivePlayer = mActivePlayer
@@ -281,7 +281,7 @@ class AIUIPlayer(context: Context) {
         }
         mIndex = -1
         val playAvailable = playToNextAvailable()
-        if(!playAvailable) {
+        if (!playAvailable) {
             mActivePlayer = backActivePlayer
             mData = backData
             mIndex = backIndex
@@ -315,8 +315,8 @@ class AIUIPlayer(context: Context) {
      * 暂停播放
      */
     fun pause() {
-        when(mState) {
-            PlayState.PLAYING,PlayState.LOADING -> {
+        when (mState) {
+            PlayState.PLAYING, PlayState.LOADING -> {
                 onStateChange(PlayState.PAUSED)
                 mActivePlayer?.pause()
             }
@@ -409,12 +409,13 @@ class AIUIPlayer(context: Context) {
             if (index !in 0 until mData.size) continue
             //寻找能处理此item的player
             val availablePlayer = mPlayers.find {
-                it.play(mData[index])
+                it.canDispose(mData[index])
             }
 
             if (availablePlayer != null) {
                 mIndex = index
                 mActivePlayer = availablePlayer
+                mActivePlayer?.play(mData[index])
                 onItemChange(mData[mIndex])
                 return true
             }
@@ -424,5 +425,16 @@ class AIUIPlayer(context: Context) {
         return false
     }
 
+    fun anyAvailablePlay(data: JSONArray, service: String): Boolean {
+        for (i in 0 until data.length()) {
+            if (mPlayers.any {
+                        it.canDispose(MetaInfo(data.optJSONObject(i), service))
+                    }) {
+                return true
+            }
+        }
+
+        return false
+    }
 }
 
