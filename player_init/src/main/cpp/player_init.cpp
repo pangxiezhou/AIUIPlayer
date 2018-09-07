@@ -7,22 +7,22 @@
 
 #include "player_init.h"
 
-char mix[] = "ZTQ2NTkwNGUtNmM1OS0xMWU3LTkyM2YtMDAxNjNlMDAyMGFk";
+char mix[] = "ZYTTQF2hNNTDkYwyNNGTUUttNMmjMY1wOYSi00xzMZWmUQ31LLTTkgywMZ2mYIttMYDTAEx1NYjTNkl1MMDDAIy0MMGjFhkj";
 
 JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initQTFM(JNIEnv *env, jclass thisClass, jobject context){
-    char _appid[49], _key[49];
+    char _client_id[49], _key[49];
 
     int cursor = 0;
     for(int index = 0; index < strlen(mix); index+=2) {
-        _appid[cursor] = mix[index];
+        _client_id[cursor] = mix[index];
         _key[cursor] = mix[index + 1];
         cursor++;
     }
 
-    _appid[48] = '\0';
+    _client_id[48] = '\0';
     _key[48] = '\0';
 
-    jstring client_ID = env->NewStringUTF(mix);
+    jstring client_ID = env->NewStringUTF(_client_id);
     //jstring appkey = env->NewStringUTF(_key);
 
     jclass QTSDKClass=env->FindClass("fm/qingting/qtsdk/QTSDK");
