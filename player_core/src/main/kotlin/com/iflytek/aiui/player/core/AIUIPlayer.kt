@@ -161,6 +161,7 @@ class AIUIPlayer(context: Context) {
     //播放列表内容
     private var mData = mutableListOf<MetaInfo>()
     private var mIndex = 0
+    private var positiveDirection = true
     //初始化标识，避免重复初始化
     private var mInitialized = false
     //Ready标记保存，Listener的注册可能在Ready之后，保证状态回调正常
@@ -202,17 +203,28 @@ class AIUIPlayer(context: Context) {
                 }
 
                 override fun onStateChange(state: MetaState) {
-                    when(state) {
+                    when (state) {
                         MetaState.COMPLETE -> {
                             if (!next()) {
                                 onComplete()
                             }
                         }
+
+                        //TODO 增加测试用例
+                        MetaState.ERROR -> {
+                           if(positiveDirection) {
+                               if (!next()) {
+                                   onComplete()
+                               }
+                           } else {
+                               previous()
+                           }
+                        }
                     }
                 }
 
                 override fun onRelease() {
-                    if(--mReadyCount == 0) {
+                    if (--mReadyCount == 0) {
                         mListeners.forEach { it.onPlayerRelease() }
                         onStateChange(PlayState.IDLE)
                     }
@@ -247,6 +259,7 @@ class AIUIPlayer(context: Context) {
      * @return 是否操作成功
      */
     fun next(): Boolean {
+        positiveDirection = true
         return playToNextAvailable()
     }
 
@@ -256,6 +269,7 @@ class AIUIPlayer(context: Context) {
      * @return 是否操作成功
      */
     fun previous(): Boolean {
+        positiveDirection = false
         return playToNextAvailable(false)
     }
 
