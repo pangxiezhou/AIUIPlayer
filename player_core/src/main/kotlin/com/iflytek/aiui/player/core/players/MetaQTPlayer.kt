@@ -21,11 +21,12 @@ typealias QTPlayerInitializer = (readyCallback: QTInitializeCallback) -> Unit
  */
 class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
     private var player: QTPlayer? = null
-    private var mPlayState = QTPlayer.PlayState.NONE
     private var mQTSDKInitialized = false
+    private var mPaused = true
     private var initializer: QTPlayerInitializer = {
         //因为蜻蜓SDK目前不提供销毁接口，重复初始化报错，故只只初始化一次
         if(!mQTSDKInitialized) {
+            QTSDK.Debug  = true
             QTSDK.setHost("https://open.staging.qingting.fm")
             PlayerInitializer.initQTFM(context)
             QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
@@ -44,7 +45,6 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         super.initialize()
         initializer?.invoke {
             player = it
-            stateChange(MetaState.READY)
             player?.addListener(object : QTPlayer.StateChangeListener {
                 override fun onPlayDurationChange(duration: Int) {
                 }
@@ -57,6 +57,10 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
                     when (state) {
                         QTPlayer.PlayState.PLAYING -> {
                             stateChange(MetaState.PLAYING)
+                            //维护pause状态，避免蜻蜓播放器Loading状态不pause的问题
+                            if(mPaused) {
+                                pause()
+                            }
                         }
 
                         QTPlayer.PlayState.PAUSED -> {
@@ -69,7 +73,6 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
                         }
                     }
 
-                    mPlayState = state
                 }
             })
         }
@@ -92,7 +95,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
             -1
         }
 
-        mPlayState = QTPlayer.PlayState.NONE
+        mPaused = false
         if (programID == -1) {
             player?.prepare(channelID)
         } else {
@@ -103,11 +106,18 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
     }
 
     override fun pause() {
-        player?.pause()
+        if(state() == MetaState.PLAYING) {
+            player?.pause()
+        }
+        mPaused = true
+
     }
 
     override fun resume() {
-        player?.play()
+        if(state() == MetaState.PAUSED) {
+            player?.play()
+        }
+        mPaused = false
     }
 
     override fun release() {
