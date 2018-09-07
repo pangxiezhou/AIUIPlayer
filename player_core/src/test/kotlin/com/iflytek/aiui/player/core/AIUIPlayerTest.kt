@@ -318,6 +318,23 @@ class AIUIPlayerTest {
     }
 
     @Test
+    fun pauseLoading() {
+        before(false)
+
+        player.play(data, SERVICE_STORY)
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+
+        player.pause()
+
+        verify(qtPlayer).pause()
+        assertEquals(player.currentState, PlayState.PAUSED)
+
+        qtPlayerListener.onStateChange(MetaState.PLAYING)
+        assertEquals(player.currentState, PlayState.PAUSED)
+    }
+
+
+    @Test
     fun resume() {
         before()
 
