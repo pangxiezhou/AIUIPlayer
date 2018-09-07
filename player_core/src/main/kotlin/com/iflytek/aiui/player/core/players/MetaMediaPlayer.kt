@@ -26,8 +26,8 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
 
             mMediaPlayer.setOnPreparedListener {
                 // 仅在处于播放状态时，缓冲后立即播放
-                // TODO 增加额外的缓冲状态
-                if(state() == MetaState.PLAYING) {
+                if(state() == MetaState.LOADING) {
+                    stateChange(MetaState.PLAYING)
                     it.start()
                 }
             }
@@ -40,11 +40,11 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
         if(!canDispose(item)) return false
 
         mMediaPlayer.reset()
-        stateChange(MetaState.PLAYING)
         mMediaPlayer.apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
             setDataSource(item.url)
             prepareAsync()
+            stateChange(MetaState.LOADING)
         }
 
         return true
