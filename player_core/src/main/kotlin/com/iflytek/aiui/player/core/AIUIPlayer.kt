@@ -351,7 +351,7 @@ class AIUIPlayer(context: Context) {
     }
 
     private fun onComplete() {
-        mIndex = mData.size
+        mIndex = mData.size - 1
         mActivePlayer?.pause()
         onStateChange(PlayState.COMPLETE)
     }
