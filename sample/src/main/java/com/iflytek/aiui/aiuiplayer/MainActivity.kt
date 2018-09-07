@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
                         "name" to "我爱北京天安门",
                         "resourceId" to "53408,2013374"
                 )))
-        ))
+        //因为第二项playUrl是story技能下才会出现的播放字段
+        ), "story")
     }
 }
