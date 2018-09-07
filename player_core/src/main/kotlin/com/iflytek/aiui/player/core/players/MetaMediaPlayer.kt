@@ -75,7 +75,7 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
     }
 
     private fun canDispose(item: MetaInfo): Boolean {
-        if(!TextUtils.isEmpty(item.source) || item.source == "iflytek") {
+        if(item.source.isEmpty() || item.source == "iflytek") {
             val url = item.url
             if(!url.isEmpty() && url.contains(Regex("mp3|m4a"))) {
                 return true

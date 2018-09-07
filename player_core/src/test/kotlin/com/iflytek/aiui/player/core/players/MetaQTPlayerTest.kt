@@ -34,7 +34,7 @@ class MetaQTPlayerTest {
     private val validItem = MetaInfo(JSONObject(hashMapOf(
             "source" to "qingtingfm",
             "resourceId" to "1234,5678"
-    )))
+    )), "story")
 
     @Before
     fun setUp() {
@@ -76,27 +76,27 @@ class MetaQTPlayerTest {
         assertTrue(player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123, 456"
-        )))))
+        )), "story")))
 
         assertTrue(player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123"
-        )))))
+        )), "story")))
 
         assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "0.1, 0.54"
-        )))))
+        )), "story")))
 
         assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "playUrl" to "http://fake.url/test.mp3"
-        )))))
+        )), "story")))
 
         assertFalse(player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "resourceId" to "123, 456"
-        )))))
+        )), "story")))
     }
 
     @Test
@@ -106,7 +106,7 @@ class MetaQTPlayerTest {
         var item = MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId, $programId"
-        )))
+        )), "story")
         player.play(item)
 
         verify(qtPlayer).prepare(eq(channelId), eq(programId))
@@ -119,7 +119,7 @@ class MetaQTPlayerTest {
         var item = MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId"
-        )))
+        )), "radio")
         player.play(item)
 
         verify(qtPlayer).prepare(eq(channelId))
