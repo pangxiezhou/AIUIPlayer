@@ -82,9 +82,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
     }
 
 
-    override fun play(info: MetaInfo):Boolean {
-        if(!canDispose(info)) return false
-
+    override fun play(info: MetaInfo) {
         val data = info.info
         //通过resourceId字段拆分出channelID和ProgramID
         //完整广播节目只包含ChannelID
@@ -104,8 +102,6 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         } else {
             player?.prepare(channelID, programID)
         }
-
-        return true
     }
 
     override fun pause() {
@@ -129,7 +125,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
         super.release()
     }
 
-    private fun canDispose(item: MetaInfo): Boolean {
+    override fun canDispose(item: MetaInfo): Boolean {
         if (item.source == "qingtingfm") {
             val resourceId = item.info.optString("resourceId", "")
             if (!resourceId.isEmpty()) {

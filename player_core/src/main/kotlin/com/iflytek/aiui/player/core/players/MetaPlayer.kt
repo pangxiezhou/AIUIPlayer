@@ -84,10 +84,11 @@ abstract class MetaAbstractPlayer {
         if (mState != MetaState.IDLE) listener.onReady()
     }
 
+    abstract fun canDispose(item: MetaInfo): Boolean
     /**
      * 播放单项内容
      */
-    abstract fun play(info: MetaInfo): Boolean
+    abstract fun play(info: MetaInfo)
 
     /**
      * 暂停播放
