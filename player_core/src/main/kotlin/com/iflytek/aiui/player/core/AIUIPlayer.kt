@@ -262,17 +262,37 @@ class AIUIPlayer(context: Context) {
 
 
     /**
+     * 信源列表是否用可播放项
+     * 需要在PlayerReady后调用
+     * @param data 信源内容列表
+     * @param service 技能名称
+     *
+     * @return 列表是否有可播放项
+     *
+     */
+    fun anyAvailablePlay(data: JSONArray, service: String): Boolean {
+        for (i in 0 until data.length()) {
+            if (mPlayers.any {
+                        it.canDispose(MetaInfo(data.optJSONObject(i), service))
+                    }) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
      * 播放信源内容列表
      * 需要在PlayerReady后调用
      * @param data 信源内容列表
+     * @param service 技能名称
+     *
+     * @return 列表是否播放成功
      *
      */
     fun play(data: JSONArray, service: String, autoSkip: Boolean = true): Boolean {
-        if (data.length() == 0) return false
-
-        val backActivePlayer = mActivePlayer
-        val backData = mData
-        val backIndex = mIndex
+        if (mState != PlayState.READY || !anyAvailablePlay(data, service)) return false
 
         mActivePlayer?.pause()
         mData = mutableListOf()
@@ -280,15 +300,8 @@ class AIUIPlayer(context: Context) {
             mData.add(MetaInfo(data.optJSONObject(i), service))
         }
         mIndex = -1
-        val playAvailable = playToNextAvailable()
-        if (!playAvailable) {
-            mActivePlayer = backActivePlayer
-            mData = backData
-            mIndex = backIndex
-        } else {
-            mAutoSkipError = autoSkip
-        }
-        return playAvailable
+        mAutoSkipError = autoSkip
+        return playToNextAvailable()
     }
 
     /**
@@ -425,16 +438,5 @@ class AIUIPlayer(context: Context) {
         return false
     }
 
-    fun anyAvailablePlay(data: JSONArray, service: String): Boolean {
-        for (i in 0 until data.length()) {
-            if (mPlayers.any {
-                        it.canDispose(MetaInfo(data.optJSONObject(i), service))
-                    }) {
-                return true
-            }
-        }
-
-        return false
-    }
 }
 
