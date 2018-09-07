@@ -2,7 +2,6 @@ package com.iflytek.aiui.player.core.players
 
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.text.TextUtils
 import com.iflytek.aiui.player.core.MetaInfo
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
@@ -41,10 +40,10 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
 
         mMediaPlayer.reset()
         mMediaPlayer.apply {
+            stateChange(MetaState.LOADING)
             setAudioStreamType(AudioManager.STREAM_MUSIC)
             setDataSource(item.url)
             prepareAsync()
-            stateChange(MetaState.LOADING)
         }
 
         return true
