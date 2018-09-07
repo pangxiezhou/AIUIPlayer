@@ -174,6 +174,7 @@ class AIUIPlayer(context: Context) {
     private var mInitialized = false
     //Ready标记保存，Listener的注册可能在Ready之后，保证状态回调正常
     private var mReadyCount = 0
+    private var mAutoSkipError = true
 
 
     //当前播放项内容
@@ -229,15 +230,20 @@ class AIUIPlayer(context: Context) {
                             }
                         }
 
-                        //TODO 增加测试用例
                         MetaState.ERROR -> {
-                           if(positiveDirection) {
-                               if (!next()) {
-                                   onComplete()
-                               }
-                           } else {
-                               previous()
-                           }
+                            if(mAutoSkipError) {
+                                if(positiveDirection) {
+                                    if (!next()) {
+                                        onStateChange(PlayState.ERROR)
+                                    }
+                                } else {
+                                    if(!previous()) {
+                                        onStateChange(PlayState.ERROR)
+                                    }
+                                }
+                            } else {
+                                onStateChange(PlayState.ERROR)
+                            }
                         }
                     }
                 }
@@ -261,7 +267,7 @@ class AIUIPlayer(context: Context) {
      * @param data 信源内容列表
      *
      */
-    fun play(data: JSONArray, service: String):Boolean {
+    fun play(data: JSONArray, service: String, autoSkip: Boolean = true):Boolean {
         if (data.length() == 0) return false
 
         val backActivePlayer = mActivePlayer
@@ -279,6 +285,8 @@ class AIUIPlayer(context: Context) {
             mActivePlayer = backActivePlayer
             mData = backData
             mIndex = backIndex
+        } else {
+            mAutoSkipError = autoSkip
         }
         return playAvailable
     }

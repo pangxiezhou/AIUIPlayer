@@ -465,6 +465,54 @@ class AIUIPlayerTest {
         verify(listener).onStateChange(PlayState.PLAYING)
     }
 
+    @Test
+    fun autoSkipError() {
+        before(false)
+
+        player.play(data, SERVICE_STORY)
+
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+        qtPlayerListener.onStateChange(MetaState.ERROR)
+
+        assertEquals(player.currentPlay, constructMetaInfo(data, 1))
+        assertEquals(player.currentState, PlayState.LOADING)
+
+        mediaPlayerListener.onStateChange(MetaState.LOADING)
+        mediaPlayerListener.onStateChange(MetaState.ERROR)
+
+        assertEquals(player.currentPlay, constructMetaInfo(data, 2))
+        assertEquals(player.currentState, PlayState.LOADING)
+
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+        qtPlayerListener.onStateChange(MetaState.ERROR)
+        assertEquals(player.currentPlay, constructMetaInfo(data, 2))
+        assertEquals(player.currentState, PlayState.ERROR)
+
+        player.reset()
+        player.play(data, SERVICE_STORY)
+
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+        qtPlayerListener.onStateChange(MetaState.PLAYING)
+
+        assertEquals(player.currentPlay, constructMetaInfo(data, 0))
+        assertEquals(player.currentState, PlayState.PLAYING)
+
+
+    }
+
+    @Test
+    fun error() {
+        before(false)
+
+        player.play(data, SERVICE_STORY, false)
+
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+        qtPlayerListener.onStateChange(MetaState.ERROR)
+
+        assertEquals(player.currentPlay, constructMetaInfo(data, 0))
+        assertEquals(player.currentState, PlayState.ERROR)
+    }
+
     private fun constructMetaInfo(source: JSONArray, index: Int): MetaInfo {
         return MetaInfo(source.optJSONObject(index), SERVICE_STORY)
     }
