@@ -2,6 +2,7 @@ package com.iflytek.aiui.player.core
 
 import android.content.Context
 import com.iflytek.aiui.player.core.players.*
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -41,6 +42,14 @@ data class MetaInfo(val info: JSONObject) {
     //TODO 覆盖更多情况的title提取
     val title: String
         get() = info.optString("name")
+
+    override fun equals(other: Any?): Boolean {
+        return if(other is MetaInfo) {
+            info == other.info
+        } else {
+            false
+        }
+    }
 }
 
 /**
@@ -86,7 +95,7 @@ class AIUIPlayer(context: Context) {
     //默认初始化状态
     private var mState: PlayState = PlayState.IDLE
     //播放列表内容
-    private var mData = listOf<MetaInfo>()
+    private var mData = mutableListOf<MetaInfo>()
     private var mIndex = 0
     //初始化标识，避免重复初始化
     private var mInitialized = false
@@ -150,18 +159,20 @@ class AIUIPlayer(context: Context) {
         mInitialized = true
     }
 
+
     /**
-     * 播放列表内容
-     *
-     * @param data 播放内容的列表
-     *
+     * 播放信源内容列表
      * 需要在PlayerReady后调用
+     * @param data 信源内容列表
+     *
      */
-    fun play(data: List<MetaInfo>) {
-        if (data.isEmpty()) return
+    fun play(data: JSONArray, service: String = "") {
+        if (data.length() == 0) return
 
         mActivePlayer?.pause()
-        mData = data
+        for(i in 0 until data.length()) {
+           mData.add(MetaInfo(data.optJSONObject(i)))
+        }
         mIndex = -1
         playToNextAvailable()
     }
@@ -218,7 +229,7 @@ class AIUIPlayer(context: Context) {
             onStateChange(PlayState.STOPPED)
             mActivePlayer?.pause()
 
-            mData = listOf()
+            mData.clear()
             mIndex = -1
         }
     }
