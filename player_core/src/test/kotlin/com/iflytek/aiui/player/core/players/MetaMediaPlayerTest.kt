@@ -71,7 +71,7 @@ class MetaMediaPlayerTest {
                 "source" to "qingtingfm",
                 "name" to "河马当保姆",
                 "resourceId" to "123, 456"
-        )))
+        )), "story")
         assertFalse(player.play(qingtingItem))
 
         val mixItem = MetaInfo(JSONObject(hashMapOf(
@@ -79,7 +79,7 @@ class MetaMediaPlayerTest {
                 "name" to "河马当保姆",
                 "playUrl" to "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214",
                 "resourceId" to "123, 456"
-        )))
+        )), "story")
         assertFalse(player.play(mixItem))
     }
 
@@ -154,7 +154,7 @@ class MetaMediaPlayerTest {
                 "playUrl" to url
         )
 
-        return MetaInfo(JSONObject(mapInfo))
+        return MetaInfo(JSONObject(mapInfo), "story")
     }
 }
 

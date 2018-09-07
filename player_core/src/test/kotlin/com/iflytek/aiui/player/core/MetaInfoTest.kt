@@ -66,6 +66,12 @@ class MetaInfoTest {
                 "playUrl" to "http://fake.url/test.mp3"
         ))
 
-        assertEquals(MetaInfo(info), MetaInfo(info))
+        assertEquals(MetaInfo(info, "story"), MetaInfo(info, "story"))
+
+        val radioItem =JSONObject(hashMapOf(
+                "name" to "广播",
+                "url" to "http://http.open.qingting.fm/786/386.mp3?deviceid=12312&clientid=ZTQ2NTkwNGUtNmM1OS0xMWU3LTkyM2YtMDAxNjNlMDAyMGFk"
+        ))
+        assertNotEquals(MetaInfo(radioItem, "story"), MetaInfo(radioItem, "radio"))
     }
 }
