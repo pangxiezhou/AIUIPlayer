@@ -15,6 +15,10 @@ enum class PlayState {
      */
     IDLE,
     /**
+     * 正在初始化
+     */
+    INITIALIZING,
+    /**
      * 就绪状态
      */
     READY,
@@ -187,6 +191,7 @@ class AIUIPlayer(context: Context) {
         // 避免重复初始化
         if (mInitialized) return
 
+        onStateChange(PlayState.INITIALIZING)
         //初始化各子播放器
         mPlayers.forEach {
             it.initialize()
@@ -323,7 +328,7 @@ class AIUIPlayer(context: Context) {
      */
     fun addListener(listener: PlayerListener) {
         mListeners.add(listener)
-        if (mState != PlayState.IDLE) {
+        if (mState != PlayState.IDLE && mState != PlayState.INITIALIZING) {
             listener.onPlayerReady()
             listener.onStateChange(PlayState.READY)
         }
