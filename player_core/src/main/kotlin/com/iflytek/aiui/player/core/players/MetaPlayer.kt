@@ -14,6 +14,10 @@ enum class MetaState {
      */
     READY,
     /**
+     * 缓冲状态
+     */
+    LOADING,
+    /**
      * 正在播放
      */
     PLAYING,
