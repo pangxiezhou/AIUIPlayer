@@ -242,15 +242,26 @@ class AIUIPlayer(context: Context) {
      * @param data 信源内容列表
      *
      */
-    fun play(data: JSONArray, service: String = "") {
-        if (data.length() == 0) return
+    fun play(data: JSONArray, service: String = ""):Boolean {
+        if (data.length() == 0) return false
+
+        val backActivePlayer = mActivePlayer
+        val backData = mData
+        val backIndex = mIndex
 
         mActivePlayer?.pause()
-        for(i in 0 until data.length()) {
-           mData.add(MetaInfo(data.optJSONObject(i)))
+        mData = mutableListOf()
+        for (i in 0 until data.length()) {
+            mData.add(MetaInfo(data.optJSONObject(i), service))
         }
         mIndex = -1
-        playToNextAvailable()
+        val playAvailable = playToNextAvailable()
+        if(!playAvailable) {
+            mActivePlayer = backActivePlayer
+            mData = backData
+            mIndex = backIndex
+        }
+        return playAvailable
     }
 
     /**
