@@ -65,7 +65,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.1.1'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.2'
 }
 ```
 
