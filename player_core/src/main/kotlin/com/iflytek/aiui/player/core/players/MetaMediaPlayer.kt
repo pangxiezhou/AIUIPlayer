@@ -22,6 +22,8 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
                 stateChange(MetaState.COMPLETE)
             }
 
+            mMediaPlayer.setOnErrorListener { _, _, _ -> true }
+
             mMediaPlayer.setOnPreparedListener {
                 // 仅在处于播放状态时，缓冲后立即播放
                 // TODO 增加额外的缓冲状态
