@@ -193,22 +193,31 @@ class AIUIPlayerTest {
     }
 
     @Test
-    fun playEmptyNotAffect() {
+    fun playFalse() {
         before()
-        player.play(data, SERVICE_STORY)
 
-        //canDispose empty list
-        player.play(JSONArray(), SERVICE_STORY)
-
-        val firstItem = constructMetaInfo(data, 0)
-        //not affect
-        assertEquals(player.currentPlay, firstItem)
+        assertTrue(player.play(data, SERVICE_STORY))
+        //非READY状态 调用play false
+        assertFalse(player.play(data, SERVICE_STORY))
         assertEquals(player.currentState, PlayState.PLAYING)
+        assertEquals(player.currentPlay, constructMetaInfo(data, 0))
 
-        player.play(invalidData, SERVICE_STORY)
-        //not affect
-        assertEquals(player.currentPlay, firstItem)
+        //reset，可调用play
+        player.reset()
+        assertTrue(player.play(data, SERVICE_STORY))
         assertEquals(player.currentState, PlayState.PLAYING)
+        assertEquals(player.currentPlay, constructMetaInfo(data, 0))
+
+        //没有可播放项时 调用play false
+        player.reset()
+        assertFalse(player.play(invalidData, SERVICE_STORY))
+        assertEquals(player.currentState, PlayState.READY)
+        assertNull(player.currentPlay)
+
+        player.reset()
+        assertFalse(player.play(JSONArray(), SERVICE_STORY))
+        assertEquals(player.currentState, PlayState.READY)
+        assertNull(player.currentPlay)
     }
 
     @Test
