@@ -111,6 +111,10 @@ abstract class MetaAbstractPlayer {
         }
         mListeners.forEach { it.onStateChange(mState) }
     }
+
+    protected fun state(): MetaState {
+        return mState
+    }
 }
 
 
