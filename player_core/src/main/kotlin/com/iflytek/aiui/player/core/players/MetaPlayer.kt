@@ -22,6 +22,10 @@ enum class MetaState {
      */
     PAUSED,
     /**
+     * 错误
+     */
+    ERROR,
+    /**
      * 播放完成
      */
     COMPLETE,
