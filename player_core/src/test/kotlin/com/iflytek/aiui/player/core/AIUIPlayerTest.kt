@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.core
 import android.test.mock.MockContext
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -59,22 +60,21 @@ class AIUIPlayerTest {
         }
     }
 
-    private val data = listOf(
-            MetaInfo(JSONObject(hashMapOf(
+    private val data = JSONArray(listOf(
+            JSONObject(hashMapOf(
                     "source" to "qingtingfm",
                     "name" to "foo",
                     "resourceId" to "123,456"
-            ))),
-            MetaInfo(JSONObject(hashMapOf(
+            )),
+            JSONObject(hashMapOf(
                     "name" to "bar",
                     "playUrl" to "http://fake.url/test.mp3"
-            ))),
-            MetaInfo(JSONObject(hashMapOf(
+            )),
+            JSONObject(hashMapOf(
                     "source" to "qingtingfm",
                     "name" to "foobar",
                     "resourceId" to "123,456"
-            )))
-    )
+            ))))
 
 
     @Test
@@ -107,8 +107,8 @@ class AIUIPlayerTest {
         before()
         player.play(data)
 
-        verify(qtPlayer).play(data[0])
-        assertEquals(player.currentPlay, data[0])
+        verify(qtPlayer).play(MetaInfo(data.optJSONObject(0)))
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(0)))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -116,7 +116,7 @@ class AIUIPlayerTest {
     fun playEmptyList() {
         before()
 
-        player.play(listOf())
+        player.play(JSONArray())
 
         assertNull(player.currentPlay)
         assertEquals(player.currentState, PlayState.READY)
@@ -127,37 +127,37 @@ class AIUIPlayerTest {
         before()
 
         val mixTypeList = listOf(
-                MetaInfo(JSONObject(hashMapOf(
+                JSONObject(hashMapOf(
                         "source" to "UnReg type",
                         "name" to "first",
                         "resourceId" to "123,456"
-                ))),
-                MetaInfo(JSONObject(hashMapOf(
+                )),
+                JSONObject(hashMapOf(
                         "source" to "qingtingfm",
                         "name" to "foo",
                         "resourceId" to "123,456"
-                ))),
-                MetaInfo(JSONObject(hashMapOf(
+                )),
+                JSONObject(hashMapOf(
                         "source" to "UnReg type",
                         "name" to "foobar",
                         "resourceId" to "123,456"
-                ))),
-                MetaInfo(JSONObject(hashMapOf(
+                )),
+                JSONObject(hashMapOf(
                         "name" to "bar",
                         "playUrl" to "http://fake.url/test.mp3"
-                ))))
-        player.play(mixTypeList)
-        assertEquals(player.currentPlay, mixTypeList[1])
+                )))
+        player.play(JSONArray(mixTypeList))
+        assertEquals(player.currentPlay, MetaInfo(mixTypeList[1]))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         player.next()
 
-        assertEquals(player.currentPlay, mixTypeList[3])
+        assertEquals(player.currentPlay, MetaInfo(mixTypeList[3]))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         player.previous()
 
-        assertEquals(player.currentPlay, mixTypeList[1])
+        assertEquals(player.currentPlay, MetaInfo(mixTypeList[1]))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -177,24 +177,24 @@ class AIUIPlayerTest {
         clearInvocations(listener)
         assertTrue(player.next())
         verify(qtPlayer).pause()
-        verify(mediaPlayer).play(data[1])
-        verify(listener).onMediaChange(data[1])
+        verify(mediaPlayer).play(MetaInfo(data.optJSONObject(1)))
+        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(1)))
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, data[1])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         assertTrue(player.next())
-        verify(qtPlayer).play(data[2])
-        verify(listener).onMediaChange(data[2])
+        verify(qtPlayer).play(MetaInfo(data.optJSONObject(2)))
+        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(2)))
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, data[2])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         assertFalse(player.next())
-        verify(qtPlayer).play(data[2])
-        verify(listener).onMediaChange(data[2])
+        verify(qtPlayer).play(MetaInfo(data.optJSONObject(2)))
+        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(2)))
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, data[2])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -211,9 +211,9 @@ class AIUIPlayerTest {
         clearInvocations(listener, qtPlayer, mediaPlayer)
         //到第二首
         assertTrue(player.previous())
-        verify(mediaPlayer).play(data[1])
-        verify(listener).onMediaChange(data[1])
-        assertEquals(player.currentPlay, data[1])
+        verify(mediaPlayer).play(MetaInfo(data.optJSONObject(1)))
+        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(1)))
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -286,11 +286,11 @@ class AIUIPlayerTest {
 
         clearInvocations(listener)
         qtPlayerListener.onStateChange(MetaState.COMPLETE)
-        assertEquals(player.currentPlay, data[1])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         mediaPlayerListener.onStateChange(MetaState.COMPLETE)
-        assertEquals(player.currentPlay, data[2])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -309,7 +309,7 @@ class AIUIPlayerTest {
 
         clearInvocations(listener)
         player.resume()
-        assertEquals(player.currentPlay, data[2])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
         assertEquals(player.currentState, PlayState.PLAYING)
         verify(listener).onStateChange(PlayState.PLAYING)
     }
@@ -326,7 +326,7 @@ class AIUIPlayerTest {
         verify(listener).onStateChange(PlayState.STOPPED)
 
         player.play(data)
-        assertEquals(player.currentPlay, data[0])
+        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(0)))
         assertEquals(player.currentState, PlayState.PLAYING)
         verify(listener).onStateChange(PlayState.PLAYING)
     }
