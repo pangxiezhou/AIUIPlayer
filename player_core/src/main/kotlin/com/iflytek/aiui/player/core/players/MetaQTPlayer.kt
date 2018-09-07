@@ -117,8 +117,7 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
     }
 
     private fun canDispose(item: MetaInfo): Boolean {
-        val source = item.info.optString("source")
-        if (source == "qingtingfm") {
+        if (item.source == "qingtingfm") {
             val resourceId = item.info.optString("resourceId", "")
             if (!resourceId.isEmpty()) {
                 val resourceIDs = resourceId.split(",")
