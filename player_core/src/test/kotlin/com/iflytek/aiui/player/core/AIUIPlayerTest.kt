@@ -17,6 +17,8 @@ import kotlin.test.assertTrue
 
 @RunWith(MockitoJUnitRunner::class)
 class AIUIPlayerTest {
+    private val SERVICE_STORY = "story"
+
     private lateinit var qtPlayerListener: MetaListener
     private lateinit var mediaPlayerListener: MetaListener
     private val qtPlayer: MetaQTPlayer = mock()
@@ -34,11 +36,11 @@ class AIUIPlayerTest {
     @Before
     fun setUp() {
         whenever(qtPlayer.play(any())).then {
-            it.getArgument<MetaInfo>(0).info.optString("source") == "qingtingfm"
+            it.getArgument<MetaInfo>(0).source== "qingtingfm"
         }
 
         whenever(mediaPlayer.play(any())).then {
-            !it.getArgument<MetaInfo>(0).info.optString("playUrl").isEmpty()
+            !it.getArgument<MetaInfo>(0).url.isEmpty()
         }
     }
 
@@ -76,6 +78,38 @@ class AIUIPlayerTest {
                     "resourceId" to "123,456"
             ))))
 
+    private val invalidData = JSONArray(listOf(
+            JSONObject(hashMapOf(
+                    "source" to "unable play",
+                    "name" to "foo",
+                    "resourceId" to "123,456"
+            )),
+            JSONObject(hashMapOf(
+                    "name" to "bar",
+                    "mp3Url" to "http://fake.url/test.mp3"
+            ))))
+
+    private val mixData = JSONArray(listOf(
+            JSONObject(hashMapOf(
+                    "source" to "UnReg type",
+                    "name" to "first",
+                    "resourceId" to "123,456"
+            )),
+            JSONObject(hashMapOf(
+                    "source" to "qingtingfm",
+                    "name" to "foo",
+                    "resourceId" to "123,456"
+            )),
+            JSONObject(hashMapOf(
+                    "source" to "UnReg type",
+                    "name" to "foobar",
+                    "resourceId" to "123,456"
+            )),
+            JSONObject(hashMapOf(
+                    "name" to "bar",
+                    "playUrl" to "http://fake.url/test.mp3"
+            )))
+    )
 
     @Test
     fun initializeNotAllReady() {
@@ -102,65 +136,6 @@ class AIUIPlayerTest {
     }
 
 
-    @Test
-    fun playMixType() {
-        before()
-        player.play(data)
-
-        verify(qtPlayer).play(MetaInfo(data.optJSONObject(0)))
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(0)))
-        assertEquals(player.currentState, PlayState.PLAYING)
-    }
-
-    @Test
-    fun playEmptyList() {
-        before()
-
-        player.play(JSONArray())
-
-        assertNull(player.currentPlay)
-        assertEquals(player.currentState, PlayState.READY)
-    }
-
-    @Test
-    fun playMixUnablePlayType() {
-        before()
-
-        val mixTypeList = listOf(
-                JSONObject(hashMapOf(
-                        "source" to "UnReg type",
-                        "name" to "first",
-                        "resourceId" to "123,456"
-                )),
-                JSONObject(hashMapOf(
-                        "source" to "qingtingfm",
-                        "name" to "foo",
-                        "resourceId" to "123,456"
-                )),
-                JSONObject(hashMapOf(
-                        "source" to "UnReg type",
-                        "name" to "foobar",
-                        "resourceId" to "123,456"
-                )),
-                JSONObject(hashMapOf(
-                        "name" to "bar",
-                        "playUrl" to "http://fake.url/test.mp3"
-                )))
-        player.play(JSONArray(mixTypeList))
-        assertEquals(player.currentPlay, MetaInfo(mixTypeList[1]))
-        assertEquals(player.currentState, PlayState.PLAYING)
-
-        player.next()
-
-        assertEquals(player.currentPlay, MetaInfo(mixTypeList[3]))
-        assertEquals(player.currentState, PlayState.PLAYING)
-
-        player.previous()
-
-        assertEquals(player.currentPlay, MetaInfo(mixTypeList[1]))
-        assertEquals(player.currentState, PlayState.PLAYING)
-    }
-
     private fun before() {
         allPlayerReady()
 
@@ -168,33 +143,84 @@ class AIUIPlayerTest {
         player.addListener(listener)
     }
 
+
+    @Test
+    fun playMixType() {
+        before()
+        player.play(data, SERVICE_STORY)
+
+        val firstItem = constructMetaInfo(data, 0)
+        verify(qtPlayer).play(firstItem)
+        assertEquals(player.currentPlay, firstItem)
+        assertEquals(player.currentState, PlayState.PLAYING)
+    }
+
+    @Test
+    fun playEmptyList() {
+        before()
+
+        player.play(JSONArray(), SERVICE_STORY)
+
+        assertNull(player.currentPlay)
+        assertEquals(player.currentState, PlayState.READY)
+    }
+
+    @Test
+    fun playEmptyNotAffect() {
+        before()
+        player.play(data, SERVICE_STORY)
+
+        //play empty list
+        player.play(JSONArray(), SERVICE_STORY)
+
+        val firstItem = constructMetaInfo(data, 0)
+        //not affect
+        assertEquals(player.currentPlay, firstItem)
+        assertEquals(player.currentState, PlayState.PLAYING)
+
+        player.play(invalidData, SERVICE_STORY)
+        //not affect
+        assertEquals(player.currentPlay, firstItem)
+        assertEquals(player.currentState, PlayState.PLAYING)
+    }
+
+
     @Test
     fun next() {
         before()
-        player.play(data)
+
+        player.play(data, SERVICE_STORY)
         verify(listener).onStateChange(PlayState.PLAYING)
 
+        val expectSecondItem = constructMetaInfo(data, 1)
         clearInvocations(listener)
+        clearInvocations(qtPlayer)
         assertTrue(player.next())
         verify(qtPlayer).pause()
-        verify(mediaPlayer).play(MetaInfo(data.optJSONObject(1)))
-        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(1)))
+        verify(mediaPlayer).play(expectSecondItem)
+        verify(listener).onMediaChange(expectSecondItem)
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
+        assertEquals(player.currentPlay, expectSecondItem)
         assertEquals(player.currentState, PlayState.PLAYING)
 
+        val expectThirdItem = constructMetaInfo(data, 2)
+        clearInvocations(listener)
+        clearInvocations(qtPlayer)
         assertTrue(player.next())
-        verify(qtPlayer).play(MetaInfo(data.optJSONObject(2)))
-        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(2)))
+        verify(qtPlayer).play(expectThirdItem)
+        verify(listener).onMediaChange(expectThirdItem)
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
+        assertEquals(player.currentPlay, expectThirdItem)
         assertEquals(player.currentState, PlayState.PLAYING)
 
+        //最后一项
         assertFalse(player.next())
-        verify(qtPlayer).play(MetaInfo(data.optJSONObject(2)))
-        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(2)))
+        clearInvocations(listener)
+        clearInvocations(qtPlayer)
+        verify(qtPlayer, never()).play(expectThirdItem)
+        verify(listener, never()).onMediaChange(expectThirdItem)
         verify(listener, never()).onStateChange(any())
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
+        assertEquals(player.currentPlay, expectThirdItem)
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -202,40 +228,75 @@ class AIUIPlayerTest {
     fun previous() {
         before()
 
-        player.play(data)
-        assertFalse(player.previous())
+        player.play(data, SERVICE_STORY)
 
-        player.next()
-        player.next()
 
+        //位于第一首，不能上一首操作
+        val expectFirstItem = constructMetaInfo(data, 0)
         clearInvocations(listener, qtPlayer, mediaPlayer)
-        //到第二首
+        assertFalse(player.previous())
+        verify(qtPlayer, never()).play(expectFirstItem)
+        verify(listener, never()).onMediaChange(expectFirstItem)
+        verify(listener, never()).onStateChange(any())
+        assertEquals(player.currentPlay, expectFirstItem)
+        assertEquals(player.currentState, PlayState.PLAYING)
+
+        player.next()
+        player.next()
+
+        val expectSecondItem = constructMetaInfo(data, 1)
+        clearInvocations(listener, qtPlayer, mediaPlayer)
         assertTrue(player.previous())
-        verify(mediaPlayer).play(MetaInfo(data.optJSONObject(1)))
-        verify(listener).onMediaChange(MetaInfo(data.optJSONObject(1)))
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
+        verify(mediaPlayer).play(expectSecondItem)
+        verify(listener).onMediaChange(expectSecondItem)
+        assertEquals(player.currentPlay, expectSecondItem)
         assertEquals(player.currentState, PlayState.PLAYING)
     }
+
+    @Test
+    fun playMixUnablePlayType() {
+        before()
+
+        player.play(mixData, SERVICE_STORY)
+
+        verify(listener, never()).onMediaChange(constructMetaInfo(mixData, 0))
+        assertEquals(player.currentPlay,constructMetaInfo(mixData, 1))
+        assertEquals(player.currentState, PlayState.PLAYING)
+
+        //自动跳过不能解析项
+        player.next()
+
+        verify(listener, never()).onMediaChange(constructMetaInfo(mixData, 2))
+        assertEquals(player.currentPlay, constructMetaInfo(mixData, 3))
+        assertEquals(player.currentState, PlayState.PLAYING)
+
+        //自动跳过不能解析项
+        player.previous()
+
+        verify(listener, never()).onMediaChange(constructMetaInfo(mixData, 2))
+        assertEquals(player.currentPlay, constructMetaInfo(mixData, 1))
+        assertEquals(player.currentState, PlayState.PLAYING)
+    }
+
 
     @Test
     fun pause() {
         before()
 
-        player.play(data)
+        player.play(data, SERVICE_STORY)
 
         clearInvocations(listener, qtPlayer, mediaPlayer)
-        player.pause()
 
+        player.pause()
         verify(qtPlayer).pause()
         verify(mediaPlayer, never()).pause()
         verify(listener).onStateChange(PlayState.PAUSED)
 
-
         player.next()
 
         clearInvocations(listener, qtPlayer, mediaPlayer)
-        player.pause()
 
+        player.pause()
         verify(mediaPlayer).pause()
         verify(qtPlayer, never()).pause()
         verify(listener).onStateChange(PlayState.PAUSED)
@@ -245,9 +306,8 @@ class AIUIPlayerTest {
     fun resume() {
         before()
 
-        player.play(data)
+        player.play(data, SERVICE_STORY)
         player.pause()
-
 
         clearInvocations(listener)
         player.resume()
@@ -269,11 +329,16 @@ class AIUIPlayerTest {
     fun autoResume() {
         before()
 
-        player.play(data)
+        player.play(data, SERVICE_STORY)
         player.pause()
 
         clearInvocations(listener)
         player.next()
+        verify(listener).onStateChange(PlayState.PLAYING)
+
+        player.pause()
+        clearInvocations(listener)
+        player.previous()
 
         verify(listener).onStateChange(PlayState.PLAYING)
     }
@@ -282,34 +347,34 @@ class AIUIPlayerTest {
     fun autoNext() {
         before()
 
-        player.play(data)
+        player.play(data, SERVICE_STORY)
 
         clearInvocations(listener)
         qtPlayerListener.onStateChange(MetaState.COMPLETE)
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(1)))
+        assertEquals(player.currentPlay, constructMetaInfo(data, 1))
         assertEquals(player.currentState, PlayState.PLAYING)
 
         mediaPlayerListener.onStateChange(MetaState.COMPLETE)
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
+        assertEquals(player.currentPlay, constructMetaInfo(data, 2))
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
     @Test
     fun complete() {
         before()
-        player.play(data)
+        player.play(data, SERVICE_STORY)
 
         qtPlayerListener.onStateChange(MetaState.COMPLETE)
         mediaPlayerListener.onStateChange(MetaState.COMPLETE)
         mediaPlayerListener.onStateChange(MetaState.COMPLETE)
 
-        assertEquals(player.currentPlay, null)
+        assertEquals(player.currentPlay, constructMetaInfo(data, 2))
         assertEquals(player.currentState, PlayState.COMPLETE)
         verify(listener).onStateChange(PlayState.COMPLETE)
 
         clearInvocations(listener)
         player.resume()
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(2)))
+        assertEquals(player.currentPlay, constructMetaInfo(data, 2))
         assertEquals(player.currentState, PlayState.PLAYING)
         verify(listener).onStateChange(PlayState.PLAYING)
     }
@@ -317,16 +382,16 @@ class AIUIPlayerTest {
     @Test
     fun stop() {
         before()
-        player.play(data)
+        player.play(data, SERVICE_STORY)
 
         clearInvocations(listener)
-        player.stop()
+        player.reset()
         assertEquals(player.currentPlay, null)
-        assertEquals(player.currentState, PlayState.STOPPED)
-        verify(listener).onStateChange(PlayState.STOPPED)
+        assertEquals(player.currentState, PlayState.READY)
+        verify(listener).onStateChange(PlayState.READY)
 
-        player.play(data)
-        assertEquals(player.currentPlay, MetaInfo(data.optJSONObject(0)))
+        player.play(data, SERVICE_STORY)
+        assertEquals(player.currentPlay, constructMetaInfo(data, 0))
         assertEquals(player.currentState, PlayState.PLAYING)
         verify(listener).onStateChange(PlayState.PLAYING)
     }
@@ -334,7 +399,7 @@ class AIUIPlayerTest {
     @Test
     fun release() {
         before()
-        player.play(data)
+        player.play(data, SERVICE_STORY)
 
         player.release()
 
@@ -353,7 +418,7 @@ class AIUIPlayerTest {
     fun listener() {
         before()
 
-        player.play(data)
+        player.play(data, SERVICE_STORY)
         verify(listener).onStateChange(PlayState.PLAYING)
 
         clearInvocations(listener)
@@ -366,5 +431,9 @@ class AIUIPlayerTest {
         player.resume()
         verify(listener).onPlayerReady()
         verify(listener).onStateChange(PlayState.PLAYING)
+    }
+
+    private fun constructMetaInfo(source: JSONArray, index: Int): MetaInfo {
+        return MetaInfo(source.optJSONObject(index), SERVICE_STORY)
     }
 }
