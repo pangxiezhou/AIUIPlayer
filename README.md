@@ -113,3 +113,7 @@ dependencies {
 ```
 
 更详细的调用参考sample目录下代码示例。
+
+## 4. 状态参考
+
+![AIUIPlayer状态参考](pictures/Status.jpg)
