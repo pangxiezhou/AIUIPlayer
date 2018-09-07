@@ -115,21 +115,24 @@ class AIUIPlayerTest {
     fun initializeNotAllReady() {
         notAllPlayerReady()
 
-        player.initialize()
         player.addListener(listener)
+        player.initialize()
 
         verify(listener, never()).onPlayerReady()
+        verify(listener).onStateChange(PlayState.INITIALIZING)
         verify(listener, never()).onStateChange(PlayState.READY)
+        assertEquals(player.currentState, PlayState.INITIALIZING)
     }
 
     @Test
     fun initializeAllReady() {
         allPlayerReady()
 
-        player.initialize()
         player.addListener(listener)
+        player.initialize()
 
         verify(listener).onPlayerReady()
+        verify(listener).onStateChange(PlayState.INITIALIZING)
         verify(listener).onStateChange(PlayState.READY)
         assertNull(player.currentPlay)
         assertEquals(player.currentState, PlayState.READY)
@@ -139,8 +142,8 @@ class AIUIPlayerTest {
     private fun before() {
         allPlayerReady()
 
-        player.initialize()
         player.addListener(listener)
+        player.initialize()
     }
 
 
