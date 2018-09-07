@@ -69,7 +69,7 @@ class AIUIPlayerTest {
 
     private val invalidData = JSONArray(listOf(
             JSONObject(hashMapOf(
-                    "source" to "unable play",
+                    "source" to "unable canDispose",
                     "name" to "foo",
                     "resourceId" to "123,456"
             )),
@@ -129,12 +129,23 @@ class AIUIPlayerTest {
 
 
     private fun before(autoPlaying: Boolean = true) {
+        whenever(qtPlayer.canDispose(any())).then {
+            val canDispose = it.getArgument<MetaInfo>(0).source== "qingtingfm"
+            canDispose
+        }
+
         whenever(qtPlayer.play(any())).then {
             val canDispose = it.getArgument<MetaInfo>(0).source== "qingtingfm"
             if(autoPlaying && canDispose) {
                 qtPlayerListener.onStateChange(MetaState.LOADING)
                 qtPlayerListener.onStateChange(MetaState.PLAYING)
             }
+            canDispose
+        }
+
+
+        whenever(mediaPlayer.canDispose(any())).then {
+            val canDispose = !it.getArgument<MetaInfo>(0).url.isEmpty()
             canDispose
         }
 
@@ -146,6 +157,7 @@ class AIUIPlayerTest {
             }
             canDispose
         }
+
 
         allPlayerReady()
 
@@ -185,7 +197,7 @@ class AIUIPlayerTest {
         before()
         player.play(data, SERVICE_STORY)
 
-        //play empty list
+        //canDispose empty list
         player.play(JSONArray(), SERVICE_STORY)
 
         val firstItem = constructMetaInfo(data, 0)
@@ -197,6 +209,15 @@ class AIUIPlayerTest {
         //not affect
         assertEquals(player.currentPlay, firstItem)
         assertEquals(player.currentState, PlayState.PLAYING)
+    }
+
+    @Test
+    fun canPlay() {
+        before()
+
+        assertTrue(player.anyAvailablePlay(data, SERVICE_STORY))
+        assertTrue(player.anyAvailablePlay(mixData, SERVICE_STORY))
+        assertFalse(player.anyAvailablePlay(invalidData, SERVICE_STORY))
     }
 
 
