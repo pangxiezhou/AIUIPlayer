@@ -55,6 +55,9 @@ class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
 
                 override fun onPlayStateChange(state: Int) {
                     when (state) {
+                        QTPlayer.PlayState.LOADING -> {
+                            stateChange(MetaState.LOADING)
+                        }
                         QTPlayer.PlayState.PLAYING -> {
                             stateChange(MetaState.PLAYING)
                             //维护pause状态，避免蜻蜓播放器Loading状态不pause的问题

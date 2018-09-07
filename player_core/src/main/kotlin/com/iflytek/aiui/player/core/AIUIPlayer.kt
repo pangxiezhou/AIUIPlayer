@@ -23,6 +23,10 @@ enum class PlayState {
      */
     READY,
     /**
+     * 资源装在加载
+     */
+    LOADING,
+    /**
      * 正在播放状态
      */
     PLAYING,
@@ -205,6 +209,16 @@ class AIUIPlayer(context: Context) {
 
                 override fun onStateChange(state: MetaState) {
                     when (state) {
+                        MetaState.LOADING -> {
+                            onStateChange(PlayState.LOADING)
+                        }
+
+                        MetaState.PLAYING -> {
+                            if(mState == PlayState.LOADING) {
+                                onStateChange(PlayState.PLAYING)
+                            }
+                        }
+
                         MetaState.COMPLETE -> {
                             if (!next()) {
                                 onComplete()
@@ -388,9 +402,6 @@ class AIUIPlayer(context: Context) {
                 mIndex = index
                 mActivePlayer = availablePlayer
                 onItemChange(mData[mIndex])
-                if (mState != PlayState.PLAYING) {
-                    onStateChange(PlayState.PLAYING)
-                }
                 return true
             }
         }
