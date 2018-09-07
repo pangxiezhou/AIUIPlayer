@@ -152,11 +152,6 @@ interface PlayerListener {
 /**
  * AIUI播放器，用来解析播放AIUI平台返回可播放的信源内容列表，
  *
- * 目前支持:
- * <ul>
- *     <li>蜻蜓FM</li>
- * </ul>
- *
  * 内部根据每项内容的source字段分发到具体的播放器
  */
 
