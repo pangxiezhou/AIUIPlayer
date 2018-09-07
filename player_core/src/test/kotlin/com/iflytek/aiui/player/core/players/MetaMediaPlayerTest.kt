@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class MetaMediaPlayerTest {
     private lateinit var onCompleteListener: MediaPlayer.OnCompletionListener
+    private lateinit var onPrepareListener: MediaPlayer.OnPreparedListener
     private val mediaPlayer:MediaPlayer = mock()
 
     @Spy
@@ -37,6 +38,15 @@ class MetaMediaPlayerTest {
         whenever(mediaPlayer.setOnCompletionListener(any())).then {
             onCompleteListener = it.getArgument(0)
             null
+        }
+
+        whenever(mediaPlayer.setOnPreparedListener(any())).then {
+            onPrepareListener = it.getArgument(0)
+            null
+        }
+
+        whenever(mediaPlayer.prepareAsync()).then {
+            onPrepareListener.onPrepared(mediaPlayer)
         }
 
         player.initialize()
@@ -78,7 +88,7 @@ class MetaMediaPlayerTest {
         player.play(validItem)
 
         verify(mediaPlayer).setDataSource(eq(url))
-        verify(mediaPlayer).prepare()
+        verify(mediaPlayer).prepareAsync()
         verify(mediaPlayer).start()
 
         verify(listener).onStateChange(MetaState.PLAYING)
@@ -92,7 +102,7 @@ class MetaMediaPlayerTest {
 
         verify(mediaPlayer).reset()
         verify(mediaPlayer).setDataSource(eq(secondUrl))
-        verify(mediaPlayer).prepare()
+        verify(mediaPlayer).prepareAsync()
 
         verify(listener).onStateChange(MetaState.PLAYING)
     }
