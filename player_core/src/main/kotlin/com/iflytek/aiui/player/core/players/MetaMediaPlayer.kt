@@ -35,9 +35,7 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
         }
     }
 
-    override fun play(item: MetaInfo):Boolean {
-        if(!canDispose(item)) return false
-
+    override fun play(item: MetaInfo) {
         mMediaPlayer.reset()
         mMediaPlayer.apply {
             stateChange(MetaState.LOADING)
@@ -45,8 +43,6 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
             setDataSource(item.url)
             prepareAsync()
         }
-
-        return true
     }
 
     override fun pause() {
@@ -73,7 +69,7 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
         super.release()
     }
 
-    private fun canDispose(item: MetaInfo): Boolean {
+    override fun canDispose(item: MetaInfo): Boolean {
         if(item.source !in listOf("qingtingfm")) {
             val url = item.url
             if(!url.isEmpty() && url.contains(Regex("mp3|m4a"))) {
