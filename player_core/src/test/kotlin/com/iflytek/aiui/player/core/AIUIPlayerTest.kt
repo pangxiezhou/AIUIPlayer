@@ -6,7 +6,6 @@ import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
@@ -33,16 +32,6 @@ class AIUIPlayerTest {
     @InjectMocks
     private val player = AIUIPlayer(MockContext())
 
-    @Before
-    fun setUp() {
-        whenever(qtPlayer.play(any())).then {
-            it.getArgument<MetaInfo>(0).source== "qingtingfm"
-        }
-
-        whenever(mediaPlayer.play(any())).then {
-            !it.getArgument<MetaInfo>(0).url.isEmpty()
-        }
-    }
 
     private fun allPlayerReady() {
         whenever(qtPlayer.addListener(any())).then {
@@ -139,7 +128,25 @@ class AIUIPlayerTest {
     }
 
 
-    private fun before() {
+    private fun before(autoPlaying: Boolean = true) {
+        whenever(qtPlayer.play(any())).then {
+            val canDispose = it.getArgument<MetaInfo>(0).source== "qingtingfm"
+            if(autoPlaying && canDispose) {
+                qtPlayerListener.onStateChange(MetaState.LOADING)
+                qtPlayerListener.onStateChange(MetaState.PLAYING)
+            }
+            canDispose
+        }
+
+        whenever(mediaPlayer.play(any())).then {
+            val canDispose = !it.getArgument<MetaInfo>(0).url.isEmpty()
+            if(autoPlaying && canDispose) {
+                mediaPlayerListener.onStateChange(MetaState.LOADING)
+                mediaPlayerListener.onStateChange(MetaState.PLAYING)
+            }
+            canDispose
+        }
+
         allPlayerReady()
 
         player.addListener(listener)
@@ -149,12 +156,17 @@ class AIUIPlayerTest {
 
     @Test
     fun playMixType() {
-        before()
+        before(false)
         player.play(data, SERVICE_STORY)
 
         val firstItem = constructMetaInfo(data, 0)
         verify(qtPlayer).play(firstItem)
         assertEquals(player.currentPlay, firstItem)
+
+        qtPlayerListener.onStateChange(MetaState.LOADING)
+        assertEquals(player.currentState, PlayState.LOADING)
+
+        qtPlayerListener.onStateChange(MetaState.PLAYING)
         assertEquals(player.currentState, PlayState.PLAYING)
     }
 
@@ -196,23 +208,23 @@ class AIUIPlayerTest {
         verify(listener).onStateChange(PlayState.PLAYING)
 
         val expectSecondItem = constructMetaInfo(data, 1)
-        clearInvocations(listener)
-        clearInvocations(qtPlayer)
+        clearInvocations(listener, qtPlayer, mediaPlayer)
         assertTrue(player.next())
         verify(qtPlayer).pause()
         verify(mediaPlayer).play(expectSecondItem)
         verify(listener).onMediaChange(expectSecondItem)
-        verify(listener, never()).onStateChange(any())
+        verify(listener).onStateChange(PlayState.LOADING)
+        verify(listener).onStateChange(PlayState.PLAYING)
         assertEquals(player.currentPlay, expectSecondItem)
         assertEquals(player.currentState, PlayState.PLAYING)
 
         val expectThirdItem = constructMetaInfo(data, 2)
-        clearInvocations(listener)
-        clearInvocations(qtPlayer)
+        clearInvocations(listener, qtPlayer, mediaPlayer)
         assertTrue(player.next())
         verify(qtPlayer).play(expectThirdItem)
         verify(listener).onMediaChange(expectThirdItem)
-        verify(listener, never()).onStateChange(any())
+        verify(listener).onStateChange(PlayState.LOADING)
+        verify(listener).onStateChange(PlayState.PLAYING)
         assertEquals(player.currentPlay, expectThirdItem)
         assertEquals(player.currentState, PlayState.PLAYING)
 
