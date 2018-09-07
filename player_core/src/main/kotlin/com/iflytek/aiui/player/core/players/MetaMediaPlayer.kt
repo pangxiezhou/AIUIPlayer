@@ -2,6 +2,7 @@ package com.iflytek.aiui.player.core.players
 
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.text.TextUtils
 import com.iflytek.aiui.player.core.MetaInfo
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
@@ -38,10 +39,9 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
 
         mMediaPlayer.reset()
         stateChange(MetaState.PLAYING)
-        val url = item.info.optString("playUrl", "")
         mMediaPlayer.apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
-            setDataSource(url)
+            setDataSource(item.url)
             prepareAsync()
         }
 
@@ -73,8 +73,8 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
     }
 
     private fun canDispose(item: MetaInfo): Boolean {
-        if(!item.info.has("source")) {
-            val url = item.info.optString("playUrl", "")
+        if(!TextUtils.isEmpty(item.source) || item.source == "iflytek") {
+            val url = item.url
             if(!url.isEmpty() && url.contains(Regex("mp3|m4a"))) {
                 return true
             }
