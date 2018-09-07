@@ -21,6 +21,14 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
                 stateChange(MetaState.COMPLETE)
             }
 
+            mMediaPlayer.setOnPreparedListener {
+                // 仅在处于播放状态时，缓冲后立即播放
+                // TODO 增加额外的缓冲状态
+                if(state() == MetaState.PLAYING) {
+                    it.start()
+                }
+            }
+
             stateChange(MetaState.READY)
         }
     }
@@ -29,14 +37,13 @@ class MetaMediaPlayer: MetaAbstractPlayer() {
         if(!canDispose(item)) return false
 
         mMediaPlayer.reset()
+        stateChange(MetaState.PLAYING)
         val url = item.info.optString("playUrl", "")
         mMediaPlayer.apply {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
             setDataSource(url)
-            prepare()
-            start()
+            prepareAsync()
         }
-        stateChange(MetaState.PLAYING)
 
         return true
     }
