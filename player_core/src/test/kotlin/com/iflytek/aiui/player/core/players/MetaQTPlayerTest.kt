@@ -29,7 +29,7 @@ class MetaQTPlayerTest {
     private lateinit var listener: MetaListener
 
     @InjectMocks
-    private val player: MetaQTPlayer = MetaQTPlayer(MockContext())
+    private val player: MetaQTPlayer = MetaQTPlayer(MockContext(), mock())
 
     private val validItem = MetaInfo(JSONObject(hashMapOf(
             "source" to "qingtingfm",

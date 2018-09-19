@@ -28,7 +28,7 @@ class MetaMediaPlayerTest {
     @Mock
     private lateinit var listener: MetaListener
     @InjectMocks
-    private val player = MetaMediaPlayer()
+    private val player = MetaMediaPlayer(mock())
 
     private val url = "http://fake.url/test.mp3"
     private val validItem = constructItem("test", url)

@@ -4,6 +4,7 @@ import fm.qingting.qtsdk.QTSDK
 import fm.qingting.qtsdk.play.QTPlay
 import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
+import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.core.MetaInfo
 import com.iflytek.aiui.player.init.PlayerInitializer
 import fm.qingting.qtsdk.callbacks.QTCallback
@@ -19,7 +20,7 @@ typealias QTPlayerInitializer = (readyCallback: QTInitializeCallback) -> Unit
  *
  * 内部通过调用蜻蜓FM SDK的接口实现播放和暂停继续的控制
  */
-class MetaQTPlayer(context: Context) : MetaAbstractPlayer() {
+class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
     private var player: QTPlayer? = null
     private var mQTSDKInitialized = false
     private var mPaused = true
