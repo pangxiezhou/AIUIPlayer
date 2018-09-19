@@ -13,6 +13,10 @@ import java.util.*
 typealias ServerInitializer = (Int) -> WebSocketServer
 typealias ClientInitializer = (String, Int) -> WebSocketClient
 
+
+/**
+ * RPC抽象连接 WebSocketServer实现
+ */
 class WebSocketServerConnection(private val port: Int) : DataConnection() {
     private lateinit var server: WebSocketServer
     private var serverInitializer: ServerInitializer = { port ->
@@ -71,23 +75,23 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
 
 }
 
+/**
+ * RPC抽象连接 WebSocketClient实现
+ */
 class WebSocketClientConnection(private val host: String, private val port: Int) : DataConnection() {
     private lateinit var client: WebSocketClient
     private var stopped = false
     private var clientInitializer: ClientInitializer = { host, port ->
         object : WebSocketClient(URI("ws://$host:$port")) {
             override fun onOpen(handshakedata: ServerHandshake?) {
-//                println("on Open")
                 onActive()
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
-//                println("On Close")
                 onDeactivate()
                 if(!stopped) {
                     Timer().schedule(object : TimerTask() {
                         override fun run() {
-//                            println("start reconnect")
                             reconnect()
                         }
                     }, 1000)

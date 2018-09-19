@@ -1,22 +1,16 @@
 package com.iflytek.aiui.player.common.rpc.connection
 
-import com.iflytek.aiui.player.common.rpc.connection.impl.ClientInitializer
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
-import com.iflytek.aiui.player.common.rpc.connection.impl.ServerInitializer
-import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.server.WebSocketServer
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Spy
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.concurrent.CountDownLatch
 import kotlin.test.assertEquals
@@ -63,6 +57,52 @@ class WebSocketConnectionTest {
     fun start() {
         assertTrue(server.active)
         assertTrue(client.active)
+    }
+
+    @Test
+    fun listenerRemove() {
+        val listener = mock<ConnectionListener>()
+        val firstCountDataDown = CountDownLatch(1)
+        server.registerConnectionListener(listener)
+        server.registerConnectionListener(object : ConnectionListener() {
+            override fun onData(data: String) {
+                firstCountDataDown.countDown()
+            }
+        })
+
+        val first = "first"
+        client.send(first)
+
+        firstCountDataDown.await()
+        verify(listener).onData(first)
+
+        clearInvocations(listener)
+        val secondCountDataDown = CountDownLatch(1)
+        server.removeConnectionListener(listener)
+        server.registerConnectionListener(object: ConnectionListener() {
+            override fun onData(data: String) {
+                secondCountDataDown.countDown()
+            }
+        })
+        val second = "second"
+        client.send(second)
+
+        secondCountDataDown.await()
+        verify(listener, never()).onData(second)
+
+        clearInvocations(listener)
+        val thirdCountDataDown = CountDownLatch(1)
+        server.registerConnectionListener(listener)
+        server.registerConnectionListener(object: ConnectionListener() {
+            override fun onData(data: String) {
+                thirdCountDataDown.countDown()
+            }
+        })
+        val third = "third"
+        client.send(third)
+
+        thirdCountDataDown.await()
+        verify(listener).onData(third)
     }
 
     @Test(timeout = 2000)
