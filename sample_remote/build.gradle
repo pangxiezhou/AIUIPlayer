@@ -32,6 +32,9 @@ android {
         test.java.srcDirs += 'test/main/kotlin'
     }
 
+    packagingOptions  {
+        exclude "META-INF/player_release.kotlin_module"
+    }
 }
 
 dependencies {
