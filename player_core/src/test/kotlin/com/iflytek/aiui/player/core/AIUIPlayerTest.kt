@@ -1,6 +1,8 @@
 package com.iflytek.aiui.player.core
 
 import android.test.mock.MockContext
+import com.iflytek.aiui.player.common.rpc.RPC
+import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray
@@ -20,6 +22,8 @@ class AIUIPlayerTest {
 
     private lateinit var qtPlayerListener: MetaListener
     private lateinit var mediaPlayerListener: MetaListener
+    private val serverConnection: DataConnection = mock()
+    private val rpcServer: RPC = mock()
     private val qtPlayer: MetaQTPlayer = mock()
     private val mediaPlayer: MetaMediaPlayer = mock()
 
