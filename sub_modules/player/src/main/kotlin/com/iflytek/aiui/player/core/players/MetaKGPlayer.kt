@@ -69,7 +69,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         } else {
             if(!mRPCRequesting) {
                 mRPCRequesting = true
-                rpc.request<String>(TokenReq.createFor(SourceType.KuGou)) {
+                rpc.request<String>(TokenReq.createFor(SourceType.KuGou), {
                     mRPCRequesting = false
                     val temp = it.split("#")
                     if (temp.size == 2) {
@@ -82,7 +82,9 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
                             retrieveURLAndCallback()
                         }
                     }
-                }
+                }, {_, _ ->
+                    mRPCRequesting = false
+                })
             }
         }
     }
