@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.core.players
 import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCCallback
+import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
 import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaInfo
 import com.nhaarman.mockitokotlin2.*
@@ -67,7 +68,7 @@ class MetaKGPlayerTest {
         setUpKuGouAPIMock()
         setUpStorageMock()
 
-        whenever(mRPC.request<String>(any(), any())).then {
+        whenever(mRPC.request<String>(any(), any(), any())).then {
             (it.arguments[1] as RPCCallback<String>)("$fakeUserID#$fakeToken")
         }
 
@@ -118,7 +119,7 @@ class MetaKGPlayerTest {
                 "itemid" to itemID
         )), "story"))
 
-        verify(mRPC).request<String>(any(), any())
+        verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI).login(fakeUserID, fakeToken)
         verify(mKuGouAPI).retrieveUrl(itemID, 0)
     }
@@ -132,7 +133,7 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        verify(mRPC).request<String>(any(), any())
+        verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI).login(fakeUserID, fakeToken)
 
         clearInvocations(mRPC)
@@ -141,7 +142,7 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        verify(mRPC, never()).request<String>(any(), any())
+        verify(mRPC, never()).request<String>(any(), any(), any())
         //一次缓存校验 一次用于rpc后登录
         verify(mKuGouAPI, times(2)).login(fakeUserID, fakeToken)
     }
@@ -153,9 +154,11 @@ class MetaKGPlayerTest {
         player.initialize()
 
         var callback: RPCCallback<String>? = null
-        whenever(mRPC.request<String>(any(), any())).then { it ->
+        var errorCallback: RPCErrorCallback? = null
+        whenever(mRPC.request<String>(any(), any(), any())).then { it ->
             //只存储，不立即回调
             callback = it.arguments[1] as RPCCallback<String>?
+            errorCallback = it.arguments[2] as RPCErrorCallback
             true
         }
 
@@ -164,7 +167,7 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        verify(mRPC).request<String>(any(), any())
+        verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
 
 
@@ -174,8 +177,17 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        verify(mRPC, never()).request<String>(any(), any())
+        verify(mRPC, never()).request<String>(any(), any(), any())
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
+
+        clearInvocations(mRPC, mKuGouAPI)
+        errorCallback?.invoke(-1, "rpc peer reset")
+        player.play(MetaInfo(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to "112358132134"
+        )), "story"))
+
+        verify(mRPC).request<String>(any(), any(), any())
     }
 
 }
