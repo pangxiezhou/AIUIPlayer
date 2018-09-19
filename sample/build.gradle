@@ -40,5 +40,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':player_core')
+    implementation project(':player_auth')
 //    implementation 'com.github.pangxiezhou.AIUIPlayer:player_core:0.2'
 }
