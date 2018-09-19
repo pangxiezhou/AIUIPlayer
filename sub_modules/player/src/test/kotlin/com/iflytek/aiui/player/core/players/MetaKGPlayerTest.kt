@@ -57,11 +57,11 @@ class MetaKGPlayerTest {
         }
 
         whenever(storage.getString(any())).then {
-            storageMap[it.arguments[0]]
+            storageMap[it.arguments[0]] ?: ""
         }
 
         whenever(storage.getInteger(any())).then {
-            storageMap[it.arguments[0]]
+            storageMap[it.arguments[0]] ?: 0
         }
 
         player.initialize()
@@ -76,12 +76,12 @@ class MetaKGPlayerTest {
     fun canDispose() {
         assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemId" to "1234567889"
+                "itemid" to "1234567889"
         )), "story")))
 
         assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "qingting",
-                "itemId" to "1234567889"
+                "itemid" to "1234567889"
         )), "story")))
 
         assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
@@ -91,7 +91,7 @@ class MetaKGPlayerTest {
 
         assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemId" to ""
+                "itemid" to ""
         )), "story")))
     }
 
@@ -100,7 +100,7 @@ class MetaKGPlayerTest {
         val itemID = "1234567889"
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemId" to itemID
+                "itemid" to itemID
         )), "story"))
 
         verify(mRPC).request<String>(any(), any())
@@ -112,7 +112,7 @@ class MetaKGPlayerTest {
     fun tokenCache() {
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemId" to "112358132134"
+                "itemid" to "112358132134"
         )), "story"))
 
         verify(mRPC).request<String>(any(), any())
@@ -121,7 +121,7 @@ class MetaKGPlayerTest {
         clearInvocations(mRPC)
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemId" to "112358132134"
+                "itemid" to "112358132134"
         )), "story"))
 
         verify(mRPC, never()).request<String>(any(), any())
