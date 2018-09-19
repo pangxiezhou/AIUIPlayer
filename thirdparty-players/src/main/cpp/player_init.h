@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initQTFM(JNIEnv *, jclass, jobject);
-JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initKuGouMusic(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_ThirdPartyPlayers_initQTFM(JNIEnv *, jclass, jobject);
+JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_ThirdPartyPlayers_initKuGouMusic(JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }
