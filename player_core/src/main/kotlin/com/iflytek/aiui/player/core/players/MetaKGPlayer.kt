@@ -1,9 +1,8 @@
 package com.iflytek.aiui.player.core.players
 
-import android.media.AudioManager
-import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaInfo
 import com.kugou.common.utils.KgInfo
 import com.kugou.common.utils.MusicJNI
@@ -30,7 +29,7 @@ class KuGouAPI {
         return ret.errorNo == 0
     }
 
-    fun retriveUrl(hash: String, albumId: Int): String {
+    fun retrieveUrl(hash: String, albumId: Int): String {
         initializeIfNeed()
         val ret = KgInfo()
         MusicJNI.KgHwsdkGetUrl(hash, ret, 0, 0)
@@ -42,7 +41,9 @@ class KuGouAPI {
     }
 }
 
-class MetaKGPlayer(rpc: RPC) : AbstractMediaPlayer(rpc) {
+class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
+    private val token_key = "token"
+    private val userid_key = "userID"
     private var mKuGouAPI = KuGouAPI()
 
     override fun initialize() {
@@ -51,15 +52,29 @@ class MetaKGPlayer(rpc: RPC) : AbstractMediaPlayer(rpc) {
     }
 
     override fun retriveURL(item: MetaInfo, callback: URLRetriveCallback) {
-        rpc.request<String>(GetToken.forSource("kugou")) {
-            val temp = it.split("#")
-            if (temp.size == 2) {
-                val userID = Integer.valueOf(temp[0])
-                val token = temp[1]
-                if (mKuGouAPI.login(userID, token)) {
-                    val url = mKuGouAPI.retriveUrl(item.info.optString("itemId"), 0)
-                    if (!url.isEmpty()) {
-                        callback(url)
+        val savedToken = storage.getString(token_key)
+        val savedUserID = storage.getInteger(userid_key)
+
+        val retrieveURLAndCallback = {
+            val url = mKuGouAPI.retrieveUrl(item.info.optString("itemId"), 0)
+            if (!url.isEmpty()) {
+                callback(url)
+            }
+        }
+
+        if (mKuGouAPI.login(savedUserID, savedToken)) {
+            retrieveURLAndCallback()
+        } else {
+            rpc.request<String>(GetToken.forSource("kugou")) {
+                val temp = it.split("#")
+                if (temp.size == 2) {
+                    val userID = Integer.valueOf(temp[0])
+                    val token = temp[1]
+                    if (mKuGouAPI.login(userID, token)) {
+                        storage.put(token_key, token)
+                        storage.put(userid_key, userID)
+
+                        retrieveURLAndCallback()
                     }
                 }
             }
