@@ -1,4 +1,4 @@
-package com.iflytek.aiui.player.common.rpc
+package com.iflytek.aiui.player.common.rpc.method
 
 import org.json.JSONObject
 
