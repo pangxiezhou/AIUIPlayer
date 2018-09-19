@@ -1,7 +1,8 @@
 package com.iflytek.aiui.player.core.players
 
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.SourceType
+import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaInfo
 import com.kugou.common.utils.KgInfo
@@ -65,7 +66,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         if (!savedToken.isEmpty() && mKuGouAPI.login(savedUserID, savedToken)) {
             retrieveURLAndCallback()
         } else {
-            rpc.request<String>(GetToken.forSource("kugou")) {
+            rpc.request<String>(TokenReq.createFor(SourceType.KuGou)) {
                 val temp = it.split("#")
                 if (temp.size == 2) {
                     val userID = Integer.valueOf(temp[0])

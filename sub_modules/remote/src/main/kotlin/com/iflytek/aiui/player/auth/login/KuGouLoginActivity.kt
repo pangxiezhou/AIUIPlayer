@@ -15,7 +15,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 
 import com.iflytek.aiui.player_auth.R
@@ -29,7 +29,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 class KuGouLoginActivity : AppCompatActivity() {
-    private var tokenReq: GetToken? = null
+    private var tokenReq: TokenReq? = null
     private var mLastVerifyKey: String? = null
 
     private val mTimer = Timer()
