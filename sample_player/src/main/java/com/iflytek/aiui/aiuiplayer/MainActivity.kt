@@ -1,12 +1,8 @@
 package com.iflytek.aiui.aiuiplayer
 
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import com.iflytek.aiui.player.auth.login.AuthRPC
-import com.iflytek.aiui.player.auth.login.KuGouLoginActivity
 import com.iflytek.aiui.player.core.AIUIPlayer
 import com.iflytek.aiui.player.core.MetaInfo
 import com.iflytek.aiui.player.core.PlayState
@@ -21,8 +17,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        AuthRPC.init(this)
 
         player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
