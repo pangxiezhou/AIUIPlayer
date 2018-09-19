@@ -1,1 +1,1 @@
-include ':sample_player', ':player_core', ':player_auth', ':player_init', ':player_common', ':sample_auth'
+include ':sample_player', ':player_core', ':player_auth', ':thirdparty-players', ':player_common', ':sample_auth'

@@ -10,7 +10,7 @@
 char qtKey[] = "ZYTTQF2hNNTDkYwyNNGTUUttNMmjMY1wOYSi00xzMZWmUQ31LLTTkgywMZ2mYIttMYDTAEx1NYjTNkl1MMDDAIy0MMGjFhkj";
 char kuGouKey[] = "29UqRDzSCIZqOkgXIEjXsnsZ3EmPuXXmYP06";
 
-JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initQTFM(JNIEnv *env, jclass thisClass, jobject context){
+JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_ThirdPartyPlayers_initQTFM(JNIEnv *env, jclass thisClass, jobject context){
     char _client_id[49], _key[49];
 
     int cursor = 0;
@@ -33,7 +33,7 @@ JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initQ
 }
 
 
-JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_PlayerInitializer_initKuGouMusic(JNIEnv *env, jclass thisClass){
+JNIEXPORT void JNICALL Java_com_iflytek_aiui_player_init_ThirdPartyPlayers_initKuGouMusic(JNIEnv *env, jclass thisClass){
     char _app_id[5], _key[33];
 
     _app_id[0] = kuGouKey[0];

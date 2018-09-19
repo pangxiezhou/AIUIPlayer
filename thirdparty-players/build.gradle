@@ -25,10 +25,11 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.jniLibs.srcDirs += 'src/main/jniLibs_gen'
     }
 
 
-    if(!file("src/main/jniLibs").exists()) {
+    if(!file("src/main/jniLibs_gen").exists()) {
         externalNativeBuild {
             cmake {
                 path 'CMakeLists.txt'
@@ -40,12 +41,14 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
-//    implementation 'com.google.code.gson:gson:2.8.5'
+    api 'com.squareup.okhttp3:okhttp:3.6.0'
+    api 'com.google.code.gson:gson:2.8.5'
 
-    implementation 'fm.qingting.open.android:qtsdkplayer:0.2.0'
-    implementation 'fm.qingting.open.android:qtsdk:1.0.2'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    api 'fm.qingting.open.android:qtsdkplayer:0.2.0'
+    api('fm.qingting.open.android:qtsdk:1.0.2') {
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
