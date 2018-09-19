@@ -6,7 +6,8 @@ import android.os.IBinder
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.SourceType
+import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.json.JSONObject
 
 class PlayerRemoteService:Service() {
@@ -25,9 +26,9 @@ class PlayerRemoteService:Service() {
                 val req = JSONObject(data)
                 when(req.optString("method")) {
                     "getAuth" -> {
-                        val getAuthReq = GetToken.deserializeFrom(data)
+                        val getAuthReq = TokenReq.createFromJSON(data)
                         when(getAuthReq.source) {
-                            "kugou" -> {
+                            SourceType.KuGou -> {
 
                             }
                         }
