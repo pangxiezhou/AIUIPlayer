@@ -183,4 +183,29 @@ class RPCTest {
         serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) {}
 //        verify(server, never()).send(any())
     }
+
+    @Test(timeout = 2000)
+    fun error() {
+        var clientRPC = RPC(client, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+            }
+        })
+
+        RPC(server, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+                //server rpc reset
+                rpc.reset()
+            }
+        })
+
+        val countErrorAfterResetDown = CountDownLatch(1)
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
+
+        }, { error, _ ->
+            assertEquals(error, -1)
+            countErrorAfterResetDown.countDown()
+        })
+
+        countErrorAfterResetDown.await()
+    }
 }
