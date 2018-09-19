@@ -1,7 +1,7 @@
 package com.iflytek.aiui.player.common.rpc
 
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.Request
 import org.json.JSONObject
 
 typealias RPCCallback<T> = (T) -> Unit
@@ -26,12 +26,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
         }
     }
 
-    fun <T> request(req: GetToken, callback: RPCCallback<T>) {
+    fun <T> request(req: Request, callback: RPCCallback<T>) {
         callbackMap[req.id] = callback as RPCCallback<Any>
         dataConnection.send(req.toJSONString())
     }
 
-    fun <T> response(req: GetToken, value: T) {
+    fun <T> response(req: Request, value: T) {
         val description = JSONObject()
         description.put("jsonrpc", "2.0")
         description.put("id", req.id)
