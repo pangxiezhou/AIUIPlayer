@@ -1,15 +1,34 @@
 package com.iflytek.aiui.player.common.rpc.connection
 
 
+/**
+ * RPC连接监听器
+ */
 abstract class ConnectionListener {
+    /**
+     * 连接启动
+     */
     open fun onStart() {}
+
+    /**
+     * 连接成功
+     */
     open fun onActive() {}
+
+    /**
+     * 连接数据回调
+     */
     open fun onData(data: String) {}
+
+    /**
+     * 连接断开
+     */
     open fun onDeactivate() {}
 }
 
-typealias DataCallback = (String?) -> Unit
-
+/**
+ * RPC 抽象连接
+ */
 abstract class DataConnection {
     private var mActive = false
     private val mListeners = mutableListOf<ConnectionListener>()
