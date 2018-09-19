@@ -3,7 +3,8 @@ package com.iflytek.aiui.player.common.rpc
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.SourceType
+import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -51,7 +52,7 @@ class RPCTest {
         val fakeServerToken = "server_foobar"
         val serverRPC = RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeServerToken)
             }
         })
@@ -59,19 +60,19 @@ class RPCTest {
         val fakeClientToken = "client_foobar"
         val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeClientToken)
             }
         })
 
         val countServerTokenRecvDown = CountDownLatch(1)
-        serverRPC.request<String>(GetToken.forSource("qingting")) { token ->
+        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
             assertEquals(token, fakeClientToken)
             countServerTokenRecvDown.countDown()
         }
 
         val countClientTokenRecvDown = CountDownLatch(1)
-        clientRPC.request<String>(GetToken.forSource("qingting")) { token ->
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
             assertEquals(token, fakeServerToken)
             countClientTokenRecvDown.countDown()
         }
@@ -85,7 +86,7 @@ class RPCTest {
         val fakeServerToken = "server_foobar"
         val serverRPC = RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeServerToken)
             }
         })
@@ -93,7 +94,7 @@ class RPCTest {
         val fakeClientToken = "client_foobar"
         val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeClientToken)
             }
         })
@@ -109,7 +110,7 @@ class RPCTest {
         server.start()
 
         val countClientTokenRecvDown = CountDownLatch(1)
-        clientRPC.request<String>(GetToken.forSource("qingting")) { token ->
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
             assertEquals(token, fakeServerToken)
             countClientTokenRecvDown.countDown()
         }
@@ -122,7 +123,7 @@ class RPCTest {
         val fakeServerToken = "server_foobar"
         val serverRPC = RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeServerToken)
             }
         })
@@ -130,7 +131,7 @@ class RPCTest {
         val fakeClientToken = "client_foobar"
         val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                val req = GetToken.deserializeFrom(data)
+                val req = TokenReq.createFromJSON(data)
                 rpc.response(req, fakeClientToken)
             }
         })
@@ -146,7 +147,7 @@ class RPCTest {
         client.start()
 
         val countServerTokenRecvDown = CountDownLatch(1)
-        serverRPC.request<String>(GetToken.forSource("qingting")) { token ->
+        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
             assertEquals(token, fakeClientToken)
             countServerTokenRecvDown.countDown()
         }
