@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.common.rpc
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.common.rpc.method.Request
+import com.iflytek.aiui.player.common.rpc.method.Response
 import org.json.JSONObject
 
 typealias RPCCallback<T> = (T) -> Unit
@@ -20,7 +21,6 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             override fun onActive() {
                 sendQueue.removeAll {
                     dataConnection.send(it)
-                    true
                 }
             }
 
@@ -38,21 +38,19 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
         })
     }
 
-    fun <T> request(req: Request, callback: RPCCallback<T>) {
-        callbackMap[req.id] = callback as RPCCallback<Any>
-        if(!dataConnection.active || dataConnection.send(req.toJSONString())) {
-            sendQueue.add(req.toJSONString())
-        }
+    fun <T> request(request: Request, callback: RPCCallback<T>) {
+        callbackMap[request.id] = callback as RPCCallback<Any>
+        send(request.toJSONString())
     }
 
     fun <T> response(req: Request, value: T) {
-        val description = JSONObject()
-        description.put("jsonrpc", "2.0")
-        description.put("id", req.id)
-        description.put("result", value.toString())
+        val response = Response(req.id, value!!)
+        send(response.toJSONString())
+    }
 
-        if(!dataConnection.active || dataConnection.send(description.toString())) {
-            sendQueue.add(description.toString())
+    private fun send(description: String) {
+        if (!dataConnection.active || dataConnection.send(description)) {
+            sendQueue.add(description)
         }
     }
 }
