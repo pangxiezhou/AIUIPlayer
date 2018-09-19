@@ -167,7 +167,7 @@ class AIUIPlayer(context: Context) {
 
         }
     })
-    private val mStorage = Storage(context)
+    private var mStorage = Storage(context)
     private var mPlayers = listOf(MetaQTPlayer(context, rpcServer), MetaMediaPlayer(rpcServer), MetaKGPlayer(rpcServer, mStorage))
     private var mActivePlayer: MetaAbstractPlayer? = null
     private val mListeners = mutableListOf<PlayerListener>()
