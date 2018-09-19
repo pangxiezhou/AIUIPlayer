@@ -19,14 +19,14 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
     private var serverInitializer: ServerInitializer = { port ->
         object : WebSocketServer(InetSocketAddress(port)) {
             override fun onOpen(conn: WebSocket?, handshake: ClientHandshake?) {
-//                println("server on client connected")
+                println("server on client connected")
                 if (connections.size == 1) {
                     onActive()
                 }
             }
 
             override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
-//                println("server on client disconnected")
+                println("server on client disconnected")
                 if (connections.isEmpty()) {
                     onDeactivate()
                 }
@@ -37,7 +37,7 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
             }
 
             override fun onStart() {
-//                println("server on Start")
+                println("server on Start")
                 this@WebSocketServerConnection.onStart()
             }
 
@@ -90,7 +90,7 @@ class WebSocketClientConnection(private val host: String, private val port: Int)
 //                            println("start reconnect")
                             reconnect()
                         }
-                    }, 100)
+                    }, 1000)
                 }
             }
 
