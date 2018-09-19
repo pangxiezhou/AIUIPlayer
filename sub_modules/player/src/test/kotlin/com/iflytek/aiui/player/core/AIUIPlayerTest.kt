@@ -1,13 +1,16 @@
 package com.iflytek.aiui.player.core
 
-import android.test.mock.MockContext
+import android.content.Context
+import android.content.SharedPreferences
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
+import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
@@ -32,10 +35,38 @@ class AIUIPlayerTest {
 
     @Mock
     private lateinit var listener: PlayerListener
+    @Mock
+    private lateinit var storage: Storage
+    private val mockContext = mock<Context>()
 
     @InjectMocks
-    private val player = AIUIPlayer(MockContext())
+    private val player = AIUIPlayer(mockContext)
 
+    @Before
+    fun setUp() {
+        val tempMap = hashMapOf<String, Any>()
+
+        whenever(storage.put(any(), any<String>())).then {
+            tempMap.put(it.arguments[0] as String , it.arguments[1])
+        }
+
+        whenever(storage.put(any(), any<Int>())).then {
+            tempMap.put(it.arguments[0] as String , it.arguments[1])
+        }
+
+        whenever(storage.getString(any())).then {
+            tempMap[it.arguments[0]] ?: ""
+        }
+
+        whenever(storage.getInteger(any())).then {
+            tempMap[it.arguments[0]] ?: 0
+        }
+
+        whenever(mockContext.getSharedPreferences(any(), any())).then {
+            mock<SharedPreferences>()
+        }
+
+    }
 
     private fun allPlayerReady() {
         whenever(qtPlayer.addListener(any())).then {
