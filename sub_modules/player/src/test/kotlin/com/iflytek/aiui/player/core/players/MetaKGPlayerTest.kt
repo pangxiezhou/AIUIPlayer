@@ -39,15 +39,13 @@ class MetaKGPlayerTest {
     private val fakeUserID = 112358132
     private val fakeToken = "fake.token"
 
-    @Before
-    fun setUp() {
+
+    private fun setUpKuGouAPIMock() {
         whenever(mKuGouAPI.login(any(), any())).thenReturn(true)
         whenever(mKuGouAPI.retrieveUrl(any(), any())).thenReturn(fakeURL)
+    }
 
-        whenever(mRPC.request<String>(any(), any())).then {
-            (it.arguments[1] as RPCCallback<String>)("$fakeUserID#$fakeToken")
-        }
-
+    private fun setUpStorageMock() {
         whenever(storage.put(any(), any<String>())).then {
             storageMap.put(it.arguments[0] as String, it.arguments[1])
         }
@@ -63,17 +61,32 @@ class MetaKGPlayerTest {
         whenever(storage.getInteger(any())).then {
             storageMap[it.arguments[0]] ?: 0
         }
+    }
+
+    private fun setUp() {
+        setUpKuGouAPIMock()
+        setUpStorageMock()
+
+        whenever(mRPC.request<String>(any(), any())).then {
+            (it.arguments[1] as RPCCallback<String>)("$fakeUserID#$fakeToken")
+        }
+
 
         player.initialize()
     }
 
+
     @Test
     fun initialize() {
+        setUp()
+
         verify(mKuGouAPI).init()
     }
 
     @Test
     fun canDispose() {
+        setUp()
+
         assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "1234567889"
@@ -97,6 +110,8 @@ class MetaKGPlayerTest {
 
     @Test
     fun play() {
+        setUp()
+
         val itemID = "1234567889"
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
@@ -110,6 +125,8 @@ class MetaKGPlayerTest {
 
     @Test
     fun tokenCache() {
+        setUp()
+
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "112358132134"
@@ -127,6 +144,38 @@ class MetaKGPlayerTest {
         verify(mRPC, never()).request<String>(any(), any())
         //一次缓存校验 一次用于rpc后登录
         verify(mKuGouAPI, times(2)).login(fakeUserID, fakeToken)
+    }
+
+    @Test
+    fun onlyOneActiveRequest() {
+        setUpKuGouAPIMock()
+        setUpStorageMock()
+        player.initialize()
+
+        var callback: RPCCallback<String>? = null
+        whenever(mRPC.request<String>(any(), any())).then { it ->
+            //只存储，不立即回调
+            callback = it.arguments[1] as RPCCallback<String>?
+            true
+        }
+
+        player.play(MetaInfo(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to "112358132134"
+        )), "story"))
+
+        verify(mRPC).request<String>(any(), any())
+        verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
+
+
+        clearInvocations(mRPC, mKuGouAPI)
+        player.play(MetaInfo(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to "112358132134"
+        )), "story"))
+
+        verify(mRPC, never()).request<String>(any(), any())
+        verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
     }
 
 }

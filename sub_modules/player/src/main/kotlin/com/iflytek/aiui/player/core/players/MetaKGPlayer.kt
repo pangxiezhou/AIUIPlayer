@@ -13,7 +13,7 @@ class KuGouAPI {
 
     private fun initializeIfNeed() {
         if(!libraryLoaded) {
-            System.loadLibrary( "kghwsdk" );
+            System.loadLibrary( "kghwsdk" )
             libraryLoaded = true
         }
     }
@@ -46,6 +46,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
     private val token_key = "token"
     private val userid_key = "userID"
     private var mKuGouAPI = KuGouAPI()
+    private var mRPCRequesting = false
 
     override fun initialize() {
         super.initialize()
@@ -66,16 +67,20 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         if (!savedToken.isEmpty() && mKuGouAPI.login(savedUserID, savedToken)) {
             retrieveURLAndCallback()
         } else {
-            rpc.request<String>(TokenReq.createFor(SourceType.KuGou)) {
-                val temp = it.split("#")
-                if (temp.size == 2) {
-                    val userID = Integer.valueOf(temp[0])
-                    val token = temp[1]
-                    if (mKuGouAPI.login(userID, token)) {
-                        storage.put(token_key, token)
-                        storage.put(userid_key, userID)
+            if(!mRPCRequesting) {
+                mRPCRequesting = true
+                rpc.request<String>(TokenReq.createFor(SourceType.KuGou)) {
+                    mRPCRequesting = false
+                    val temp = it.split("#")
+                    if (temp.size == 2) {
+                        val userID = Integer.valueOf(temp[0])
+                        val token = temp[1]
+                        if (mKuGouAPI.login(userID, token)) {
+                            storage.put(token_key, token)
+                            storage.put(userid_key, userID)
 
-                        retrieveURLAndCallback()
+                            retrieveURLAndCallback()
+                        }
                     }
                 }
             }
