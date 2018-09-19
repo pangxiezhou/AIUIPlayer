@@ -4,6 +4,7 @@ import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
 import com.iflytek.aiui.player.common.rpc.method.GetToken
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -38,31 +39,118 @@ class RPCTest {
         countConnectionDown.await()
     }
 
+    @After
+    fun tearDown() {
+        client.stop()
+        server.stop()
+    }
+
 
     @Test()
-    fun invoke() {
-        val countTokenRecvDown = CountDownLatch(1)
-        val fakeToken = "foobar"
+    fun rpc() {
+        val fakeServerToken = "server_foobar"
         val serverRPC = RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
+                val req = GetToken.deserializeFrom(data)
+                rpc.response(req, fakeServerToken)
             }
         })
 
+        val fakeClientToken = "client_foobar"
         val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
                 val req = GetToken.deserializeFrom(data)
-                rpc.response(req, fakeToken)
+                rpc.response(req, fakeClientToken)
             }
         })
 
+        val countServerTokenRecvDown = CountDownLatch(1)
         serverRPC.request<String>(GetToken.forSource("qingting")) { token ->
-            countTokenRecvDown.countDown()
-            assertEquals(token, fakeToken)
+            assertEquals(token, fakeClientToken)
+            countServerTokenRecvDown.countDown()
         }
 
-        countTokenRecvDown.await()
+        val countClientTokenRecvDown = CountDownLatch(1)
+        clientRPC.request<String>(GetToken.forSource("qingting")) { token ->
+            assertEquals(token, fakeServerToken)
+            countClientTokenRecvDown.countDown()
+        }
+
+        countServerTokenRecvDown.await()
+        countClientTokenRecvDown.await()
+    }
+
+    @Test
+    fun clientRetry() {
+        val fakeServerToken = "server_foobar"
+        val serverRPC = RPC(server, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+                val req = GetToken.deserializeFrom(data)
+                rpc.response(req, fakeServerToken)
+            }
+        })
+
+        val fakeClientToken = "client_foobar"
+        val clientRPC = RPC(client, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+                val req = GetToken.deserializeFrom(data)
+                rpc.response(req, fakeClientToken)
+            }
+        })
+
+        server.stop()
+        val countClientDeactivateDown = CountDownLatch(1)
+        client.registerConnectionListener(object : ConnectionListener() {
+            override fun onDeactivate() {
+                countClientDeactivateDown.countDown()
+            }
+        })
+        countClientDeactivateDown.await()
+        server.start()
+
+        val countClientTokenRecvDown = CountDownLatch(1)
+        clientRPC.request<String>(GetToken.forSource("qingting")) { token ->
+            assertEquals(token, fakeServerToken)
+            countClientTokenRecvDown.countDown()
+        }
+
+        countClientTokenRecvDown.await()
+    }
+
+    @Test
+    fun serverRetry() {
+        val fakeServerToken = "server_foobar"
+        val serverRPC = RPC(server, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+                val req = GetToken.deserializeFrom(data)
+                rpc.response(req, fakeServerToken)
+            }
+        })
+
+        val fakeClientToken = "client_foobar"
+        val clientRPC = RPC(client, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+                val req = GetToken.deserializeFrom(data)
+                rpc.response(req, fakeClientToken)
+            }
+        })
 
         client.stop()
-        server.stop()
+        val countServerDeactivateDown = CountDownLatch(1)
+        server.registerConnectionListener(object : ConnectionListener() {
+            override fun onDeactivate() {
+                countServerDeactivateDown.countDown()
+            }
+        })
+        countServerDeactivateDown.await()
+        client.start()
+
+        val countServerTokenRecvDown = CountDownLatch(1)
+        serverRPC.request<String>(GetToken.forSource("qingting")) { token ->
+            assertEquals(token, fakeClientToken)
+            countServerTokenRecvDown.countDown()
+        }
+
+        countServerTokenRecvDown.await()
     }
 }
