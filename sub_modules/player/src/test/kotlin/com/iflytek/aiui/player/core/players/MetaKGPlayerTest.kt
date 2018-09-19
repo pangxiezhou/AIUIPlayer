@@ -6,6 +6,7 @@ import com.iflytek.aiui.player.common.rpc.RPCCallback
 import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
 import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaInfo
+import com.kugou.common.utils.KgInfo
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -42,8 +43,22 @@ class MetaKGPlayerTest {
 
 
     private fun setUpKuGouAPIMock() {
-        whenever(mKuGouAPI.login(any(), any())).thenReturn(true)
-        whenever(mKuGouAPI.retrieveUrl(any(), any())).thenReturn(fakeURL)
+        var hasLogin = false
+        whenever(mKuGouAPI.login(any(), any())).then {
+            hasLogin  = true
+            true
+        }
+        whenever(mKuGouAPI.retrieveUrl(any(), any())).then {
+            val kgInfo = KgInfo()
+            if(hasLogin) {
+                kgInfo.errorNo = 0
+                kgInfo.Info = fakeURL
+            } else {
+                kgInfo.errorNo = -2
+                kgInfo.Info = "token expire"
+            }
+            kgInfo
+        }
     }
 
     private fun setUpStorageMock() {
@@ -121,37 +136,79 @@ class MetaKGPlayerTest {
 
         verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI).login(fakeUserID, fakeToken)
-        verify(mKuGouAPI).retrieveUrl(itemID, 0)
+        verify(mKuGouAPI, times(2)).retrieveUrl(itemID, 0)
     }
 
     @Test
     fun tokenCache() {
         setUp()
 
+        var hasLogin = false
+        whenever(mKuGouAPI.login(any(), any())).then {
+            hasLogin  = true
+            true
+        }
+        whenever(mKuGouAPI.retrieveUrl(any(), any())).then {
+            val kgInfo = KgInfo()
+            if(hasLogin) {
+                kgInfo.errorNo = 0
+                kgInfo.Info = fakeURL
+            } else {
+                kgInfo.errorNo = -2
+                kgInfo.Info = "token expire"
+            }
+            kgInfo
+        }
+
+        val itemId = "112358132134"
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemid" to "112358132134"
+                "itemid" to itemId
         )), "story"))
 
         verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI).login(fakeUserID, fakeToken)
 
-        clearInvocations(mRPC)
+        clearInvocations(mRPC, mKuGouAPI)
         player.play(MetaInfo(JSONObject(hashMapOf(
                 "source" to "kugou",
-                "itemid" to "112358132134"
+                "itemid" to itemId
         )), "story"))
 
+        verify(mKuGouAPI).retrieveUrl(itemId, 0)
+        verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
         verify(mRPC, never()).request<String>(any(), any(), any())
-        //一次缓存校验 一次用于rpc后登录
-        verify(mKuGouAPI, times(2)).login(fakeUserID, fakeToken)
+
+        clearInvocations(mRPC, mKuGouAPI)
+        hasLogin = false
+        player.play(MetaInfo(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to itemId
+        )), "story"))
+
+        verify(mKuGouAPI, times(2)).retrieveUrl(itemId, 0)
+        verify(mKuGouAPI).login(fakeUserID, fakeToken)
+        //使用本地存储的token缓存
+        verify(mRPC, never()).request<String>(any(), any(), any())
+
+        clearInvocations(mRPC, mKuGouAPI)
+        hasLogin = false
+        storageMap.clear()
+        player.play(MetaInfo(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to itemId
+        )), "story"))
+
+        verify(mKuGouAPI, times(2)).retrieveUrl(itemId, 0)
+        verify(mKuGouAPI).login(fakeUserID, fakeToken)
+        //本地存储token清空，重新rpc请求
+        verify(mRPC).request<String>(any(), any(), any())
+
     }
 
     @Test
     fun onlyOneActiveRequest() {
-        setUpKuGouAPIMock()
-        setUpStorageMock()
-        player.initialize()
+        setUp()
 
         var callback: RPCCallback<String>? = null
         var errorCallback: RPCErrorCallback? = null
@@ -167,8 +224,8 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        verify(mRPC).request<String>(any(), any(), any())
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
+        verify(mRPC).request<String>(any(), any(), any())
 
 
         clearInvocations(mRPC, mKuGouAPI)
@@ -189,5 +246,7 @@ class MetaKGPlayerTest {
 
         verify(mRPC).request<String>(any(), any(), any())
     }
+
+
 
 }
