@@ -12,6 +12,9 @@ interface RPCListener {
     fun onRequest(rpc: RPC, data: String)
 }
 
+/**
+ * JSONRPC 远程调用接口
+ */
 class RPC(private val dataConnection: DataConnection, private val rpcListener: RPCListener) {
     private val callbackMap = hashMapOf<Int, RPCCallback<Any>>()
     private val sendQueue = mutableListOf<String>()
@@ -27,7 +30,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             override fun onData(message: String) {
                 val data = JSONObject(message)
                 if (data.has("result")) {
-                    callbackMap[data.optInt("id")]?.invoke(data.optString("result"))
+                    callbackMap[data.optInt("id")]?.invoke(data.opt("result"))
                 } else {
                     rpcListener.onRequest(this@RPC, message)
                 }
@@ -37,6 +40,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             }
         })
     }
+
 
     fun <T> request(request: Request, callback: RPCCallback<T>) {
         callbackMap[request.id] = callback as RPCCallback<Any>
@@ -49,8 +53,14 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     }
 
     private fun send(description: String) {
+        println("active ${dataConnection.active} $dataConnection send $description")
         if (!dataConnection.active || dataConnection.send(description)) {
             sendQueue.add(description)
         }
+    }
+
+    fun reset() {
+        sendQueue.clear()
+        callbackMap.clear()
     }
 }
