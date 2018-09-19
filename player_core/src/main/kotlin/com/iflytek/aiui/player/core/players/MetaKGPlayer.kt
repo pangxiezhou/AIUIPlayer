@@ -56,13 +56,13 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         val savedUserID = storage.getInteger(userid_key)
 
         val retrieveURLAndCallback = {
-            val url = mKuGouAPI.retrieveUrl(item.info.optString("itemId"), 0)
+            val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
             if (!url.isEmpty()) {
                 callback(url)
             }
         }
 
-        if (mKuGouAPI.login(savedUserID, savedToken)) {
+        if (!savedToken.isEmpty() && mKuGouAPI.login(savedUserID, savedToken)) {
             retrieveURLAndCallback()
         } else {
             rpc.request<String>(GetToken.forSource("kugou")) {
@@ -83,7 +83,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
 
     override fun canDispose(item: MetaInfo): Boolean {
         if(item.source == "kugou") {
-            val itemID = item.info.optString("itemId", "")
+            val itemID = item.info.optString("itemid", "")
             if(!itemID.isEmpty()) {
                return true
             }
