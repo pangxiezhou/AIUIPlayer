@@ -12,8 +12,8 @@ class KuGouAPI {
     private var libraryLoaded = false
 
     private fun initializeIfNeed() {
-        if(!libraryLoaded) {
-            System.loadLibrary( "kghwsdk" )
+        if (!libraryLoaded) {
+            System.loadLibrary("kghwsdk")
             libraryLoaded = true
         }
     }
@@ -30,21 +30,17 @@ class KuGouAPI {
         return ret.errorNo == 0
     }
 
-    fun retrieveUrl(hash: String, albumId: Int): String {
+    fun retrieveUrl(hash: String, albumId: Int): KgInfo {
         initializeIfNeed()
         val ret = KgInfo()
         MusicJNI.KgHwsdkGetUrl(hash, ret, 0, 0)
-        return if (ret.errorNo == 0) {
-            ret.Info
-        } else {
-            ""
-        }
+        return ret
     }
 }
 
 class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
-    private val token_key = "token"
-    private val userid_key = "userID"
+    private val tokenKey = "token"
+    private val userIDKey = "userID"
     private var mKuGouAPI = KuGouAPI()
     private var mRPCRequesting = false
 
@@ -54,20 +50,34 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
     }
 
     override fun retriveURL(item: MetaInfo, callback: URLRetriveCallback) {
-        val savedToken = storage.getString(token_key)
-        val savedUserID = storage.getInteger(userid_key)
+        val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
+        when (url.errorNo) {
+            0 -> {
+                if (url.Info?.isEmpty() == false) {
+                    callback(url.Info)
+                } else {
+                    //酷狗SDK问题, 在未登录情况下依旧返回0
+                    //故认为error = 0 info = null的情况下做未授权的处理
+                    onTokenExpire(item, callback)
+                }
+            }
 
-        val retrieveURLAndCallback = {
-            val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
-            if (!url.isEmpty()) {
-                callback(url)
+            //Token过期
+            -2 -> {
+                onTokenExpire(item, callback)
             }
         }
+    }
 
+    private fun onTokenExpire(item: MetaInfo, callback: URLRetriveCallback) {
+        val savedToken = storage.getString(tokenKey)
+        val savedUserID = storage.getInteger(userIDKey)
+        //首先用本地缓存token进行登录
         if (!savedToken.isEmpty() && mKuGouAPI.login(savedUserID, savedToken)) {
-            retrieveURLAndCallback()
+            retriveURL(item, callback)
         } else {
-            if(!mRPCRequesting) {
+            //当前正在请求中，不重复请求
+            if (!mRPCRequesting) {
                 mRPCRequesting = true
                 rpc.request<String>(TokenReq.createFor(SourceType.KuGou), {
                     mRPCRequesting = false
@@ -76,13 +86,13 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
                         val userID = Integer.valueOf(temp[0])
                         val token = temp[1]
                         if (mKuGouAPI.login(userID, token)) {
-                            storage.put(token_key, token)
-                            storage.put(userid_key, userID)
+                            storage.put(tokenKey, token)
+                            storage.put(userIDKey, userID)
 
-                            retrieveURLAndCallback()
+                            retriveURL(item, callback)
                         }
                     }
-                }, {_, _ ->
+                }, { _, _ ->
                     mRPCRequesting = false
                 })
             }
@@ -90,10 +100,10 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
     }
 
     override fun canDispose(item: MetaInfo): Boolean {
-        if(item.source == "kugou") {
+        if (item.source == "kugou") {
             val itemID = item.info.optString("itemid", "")
-            if(!itemID.isEmpty()) {
-               return true
+            if (!itemID.isEmpty()) {
+                return true
             }
         }
 
