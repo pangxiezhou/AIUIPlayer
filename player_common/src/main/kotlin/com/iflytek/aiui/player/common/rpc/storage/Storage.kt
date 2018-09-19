@@ -13,7 +13,7 @@ class Storage(context: Context) {
         sharedPreferences.edit().putInt(key, value).commit()
     }
 
-    fun getString(key: String): String? {
+    fun getString(key: String): String {
         return sharedPreferences.getString(key, "")
     }
 
