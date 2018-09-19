@@ -18,7 +18,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             if (message != null)  {
                 val data = JSONObject(message)
                 if (data.has("result")) {
-                    callbackMap.get(data.optInt("id"))?.invoke(data.optString("result"))
+                    callbackMap[data.optInt("id")]?.invoke(data.optString("result"))
                 } else {
                     rpcListener.onRequest(this@RPC, message)
                 }
@@ -27,7 +27,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     }
 
     fun <T> request(req: GetToken, callback: RPCCallback<T>) {
-        callbackMap.put(req.id, callback as RPCCallback<Any>)
+        callbackMap[req.id] = callback as RPCCallback<Any>
         dataConnection.send(req.toJSONString())
     }
 
