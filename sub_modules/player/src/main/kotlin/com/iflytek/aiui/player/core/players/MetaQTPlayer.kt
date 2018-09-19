@@ -28,9 +28,8 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
         //因为蜻蜓SDK目前不提供销毁接口，重复初始化报错，故只只初始化一次
         if(!mQTSDKInitialized) {
             QTSDK.Debug  = true
-            QTSDK.setHost("https://open.staging.qingting.fm")
+            QTSDK.setHost("https://api.open.qingting.fm")
             ThirdPartyPlayers.initQTFM(context)
-            QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
             QTPlay.initial(QTCallback { success, _ ->
                 if(success) {
                     it(QTSDK.getPlayer())
