@@ -29,6 +29,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    packagingOptions {
+        exclude "META-INF/player_release.kotlin_module"
+    }
+
 }
 
 dependencies {
