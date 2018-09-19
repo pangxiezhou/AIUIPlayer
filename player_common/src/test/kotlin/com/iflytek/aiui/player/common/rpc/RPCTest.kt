@@ -19,7 +19,7 @@ class RPCTest {
     fun setUp() {
         //Server和Client Connection建立
         val countStartDown = CountDownLatch(1)
-        server = WebSocketServerConnection(port, object : ServerConnectionListener {
+        server = WebSocketServerConnection(port, object : ServerConnectionListener() {
             override fun onStart() {
                 countStartDown.countDown()
             }
@@ -28,12 +28,12 @@ class RPCTest {
         countStartDown.await()
 
         val countConnectionDown = CountDownLatch(1)
-        client = WebSocketClientConnection("localhost", port, object : ClientConnectionListener {
+        client = WebSocketClientConnection("localhost", port, object : ClientConnectionListener() {
             override fun onOpen() {
                 countConnectionDown.countDown()
             }
         })
-        client.connect()
+        client.start()
         countConnectionDown.await()
     }
 
@@ -61,5 +61,8 @@ class RPCTest {
         }
 
         countTokenRecvDown.await()
+
+        client.stop()
+        server.stop()
     }
 }
