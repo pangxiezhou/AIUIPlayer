@@ -1,6 +1,7 @@
 package com.iflytek.aiui.player.init
 
 import android.content.Context
+import com.kugou.kgmusicsdk.KGMusicSDK
 
 class PlayerInitializer {
     companion object {
@@ -10,5 +11,8 @@ class PlayerInitializer {
 
         @JvmStatic
         external fun initQTFM(context: Context)
+
+        @JvmStatic
+        external fun initKuGouMusic()
     }
 }

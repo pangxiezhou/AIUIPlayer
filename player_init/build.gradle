@@ -39,7 +39,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
+//    implementation 'com.google.code.gson:gson:2.8.5'
 
     implementation 'fm.qingting.open.android:qtsdkplayer:0.2.0'
     implementation 'fm.qingting.open.android:qtsdk:1.0.2'
