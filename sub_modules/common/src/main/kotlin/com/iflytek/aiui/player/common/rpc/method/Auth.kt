@@ -4,52 +4,63 @@ import android.os.Parcel
 import android.os.Parcelable
 import org.json.JSONObject
 
+enum class SourceType {
+    QingTing,
+    KuGou;
 
-class GetToken(from: String?, serializeData: String? = null): Request(serializeData), Parcelable{
-    val source: String?
-
-    init {
-        source = from ?:  JSONObject(serializeData).optJSONObject("params")?.optString("source")
-        addParams("source", source!!)
+    override fun toString(): String {
+        return when (this) {
+            SourceType.QingTing -> "QingTing"
+            SourceType.KuGou -> "KuGou"
+        }
     }
 
-    override fun methodName(): String {
-        return "getAuth"
+    companion object {
+        fun createFromString(description: String): SourceType? {
+            return when (description) {
+                "QingTing" -> SourceType.QingTing
+                "KuGou" -> SourceType.KuGou
+                else -> null
+            }
+        }
+    }
+}
+
+class TokenReq : Request, Parcelable {
+    val source: SourceType
+
+    constructor(source: SourceType) : super("getAuth") {
+        this.source = source
+        addParam("source", source.toString())
+    }
+
+    constructor(serializeData: JSONObject) : super(serializeData) {
+        source = SourceType.createFromString(getStringParam("source"))!!
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
-        parcel.writeString(source)
+        parcel.writeString(toJSONString())
     }
 
     override fun describeContents(): Int {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<GetToken> {
-        override fun createFromParcel(parcel: Parcel): GetToken {
-            val description = JSONObject()
-
-            description.put("jsonrpc", "2.0")
-            description.put("id", parcel.readInt())
-            description.put("method", "getAuth")
-            description.put("params", JSONObject(hashMapOf(
-                    "source" to parcel.readString()
-            )))
-
-            return deserializeFrom(description.toString())
+    companion object CREATOR : Parcelable.Creator<TokenReq> {
+        override fun createFromParcel(parcel: Parcel): TokenReq {
+            return createFromJSON(parcel.readString())
         }
 
-        override fun newArray(size: Int): Array<GetToken?> {
+        override fun newArray(size: Int): Array<TokenReq?> {
             return arrayOfNulls(size)
         }
 
-        fun forSource(source: String): GetToken {
-            return GetToken(source)
+        fun createFor(source: SourceType): TokenReq {
+            return TokenReq(source)
         }
 
-        fun deserializeFrom(serializeData: String): GetToken {
-            return GetToken(null, serializeData)
+        fun createFromJSON(serializeData: String): TokenReq {
+            return TokenReq(JSONObject(serializeData))
         }
     }
 }

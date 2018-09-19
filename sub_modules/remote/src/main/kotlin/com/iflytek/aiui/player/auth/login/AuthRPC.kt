@@ -5,7 +5,8 @@ import android.content.Intent
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
-import com.iflytek.aiui.player.common.rpc.method.GetToken
+import com.iflytek.aiui.player.common.rpc.method.SourceType
+import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.json.JSONObject
 
 object AuthRPC {
@@ -21,9 +22,9 @@ object AuthRPC {
                 val req = JSONObject(data)
                 when (req.optString("method")) {
                     "getAuth" -> {
-                        val getAuthReq = GetToken.deserializeFrom(data)
+                        val getAuthReq = TokenReq.createFromJSON(data)
                         when (getAuthReq.source) {
-                            "kugou" -> {
+                            SourceType.KuGou -> {
                                 val intent = Intent(context, KuGouLoginActivity::class.java)
                                 intent.putExtra("request", getAuthReq)
                                 context.startActivity(intent)
