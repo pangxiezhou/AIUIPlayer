@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AIUIPlayer</string>
+    <string name="app_name">sample_player</string>
     <string name="preTip">上一首</string>
     <string name="pauseTip">暂停</string>
     <string name="nextTip">下一首</string>
