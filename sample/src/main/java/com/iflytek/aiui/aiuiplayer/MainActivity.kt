@@ -1,9 +1,12 @@
 package com.iflytek.aiui.aiuiplayer
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.iflytek.aiui.player.auth.login.AuthRPC
+import com.iflytek.aiui.player.auth.login.KuGouLoginActivity
 import com.iflytek.aiui.player.core.AIUIPlayer
 import com.iflytek.aiui.player.core.MetaInfo
 import com.iflytek.aiui.player.core.PlayState
@@ -13,13 +16,15 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
-    private val player: AIUIPlayer = AIUIPlayer(this)
+    private lateinit var player: AIUIPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        AuthRPC.init(this)
 
+        player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
             override fun onPlayerReady() {
                 titleTxt.text = "初始化成功"
@@ -89,6 +94,11 @@ class MainActivity : AppCompatActivity() {
                         "source" to "qingtingfm",
                         "name" to "樊梨花_5",
                         "resourceId" to "5142784,1434436"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "kugou",
+                        "name" to "尽头",
+                        "itemid" to "73f211b375593a4332bb5e4a28602c61"
                 )),
                 JSONObject(hashMapOf(
                         "source" to "qingtingfm",
