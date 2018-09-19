@@ -15,6 +15,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
+import com.iflytek.aiui.player.auth.PlayerRemote
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 
@@ -112,7 +113,7 @@ class KuGouLoginActivity : AppCompatActivity() {
                     val token = data.optString("token")
                     val userId = data.optInt("userid")
                     if(tokenReq != null) {
-                        AuthRPC.rpcProxy?.response(tokenReq!!, "$userId#$token")
+                        PlayerRemote.rpcProxy?.response(tokenReq!!, "$userId#$token")
                     }
                     this@KuGouLoginActivity.finish()
                     "登录成功"
