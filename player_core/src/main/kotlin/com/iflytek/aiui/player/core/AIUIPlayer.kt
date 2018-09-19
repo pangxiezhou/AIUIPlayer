@@ -2,6 +2,10 @@ package com.iflytek.aiui.player.core
 
 import android.content.Context
 import android.text.TextUtils
+import com.iflytek.aiui.player.common.rpc.RPC
+import com.iflytek.aiui.player.common.rpc.RPCListener
+import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
+import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
 import com.iflytek.aiui.player.core.players.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -156,7 +160,13 @@ interface PlayerListener {
  */
 
 class AIUIPlayer(context: Context) {
-    private var mPlayers = listOf(MetaQTPlayer(context), MetaMediaPlayer())
+    private var serverConnection = WebSocketServerConnection(4096)
+    private var rpcServer = RPC(serverConnection, object: RPCListener {
+        override fun onRequest(rpc: RPC, data: String) {
+
+        }
+    })
+    private var mPlayers = listOf(MetaQTPlayer(context, rpcServer), MetaMediaPlayer(rpcServer), MetaKGPlayer(rpcServer))
     private var mActivePlayer: MetaAbstractPlayer? = null
     private val mListeners = mutableListOf<PlayerListener>()
     //默认初始化状态
@@ -185,6 +195,10 @@ class AIUIPlayer(context: Context) {
     //当前播放状态
     val currentState
         get() = mState
+
+    init {
+        serverConnection.start()
+    }
 
     /**
      * 初始化，在构造完成后立即调用

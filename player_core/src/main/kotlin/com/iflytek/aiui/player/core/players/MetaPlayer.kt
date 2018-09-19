@@ -1,6 +1,7 @@
 package com.iflytek.aiui.player.core.players
 
 import android.support.annotation.CallSuper
+import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.core.MetaInfo
 
 
@@ -58,7 +59,7 @@ interface MetaListener {
 /**
  * Meta抽象播放器
  */
-abstract class MetaAbstractPlayer {
+abstract class MetaAbstractPlayer(protected val rpc: RPC) {
     private var mListeners = mutableListOf<MetaListener>()
     private var mInitialized = false
     private var mState = MetaState.IDLE
