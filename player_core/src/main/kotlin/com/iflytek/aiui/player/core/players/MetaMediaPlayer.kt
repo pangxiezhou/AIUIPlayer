@@ -2,12 +2,13 @@ package com.iflytek.aiui.player.core.players
 
 import android.media.AudioManager
 import android.media.MediaPlayer
+import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.core.MetaInfo
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
 typealias MediaPlayerInitializer = (MediaPlayerCallBack) -> Unit
 
-class MetaMediaPlayer: MetaAbstractPlayer() {
+class MetaMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
     private lateinit var mMediaPlayer:MediaPlayer
     private var mInitializer:MediaPlayerInitializer = { callback ->
         callback(MediaPlayer())
