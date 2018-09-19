@@ -64,7 +64,7 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
         return try {
             server.broadcast(data)
             true
-        } catch (e: WebsocketNotConnectedException) {
+        } catch (e: Exception) {
             false
         }
     }
@@ -117,7 +117,7 @@ class WebSocketClientConnection(private val host: String, private val port: Int)
         return try {
             client.send(data)
             true
-        } catch (e: WebsocketNotConnectedException) {
+        } catch (e: Exception) {
             false
         }
     }

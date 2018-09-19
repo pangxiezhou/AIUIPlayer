@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCListener
+import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
 import com.iflytek.aiui.player.core.players.*
@@ -160,7 +161,7 @@ interface PlayerListener {
  */
 
 class AIUIPlayer(context: Context) {
-    private var serverConnection = WebSocketServerConnection(4096)
+    private var serverConnection:DataConnection = WebSocketServerConnection(4096)
     private var rpcServer = RPC(serverConnection, object: RPCListener {
         override fun onRequest(rpc: RPC, data: String) {
 
@@ -196,10 +197,6 @@ class AIUIPlayer(context: Context) {
     val currentState
         get() = mState
 
-    init {
-        serverConnection.start()
-    }
-
     /**
      * 初始化，在构造完成后立即调用
      *
@@ -209,6 +206,7 @@ class AIUIPlayer(context: Context) {
         // 避免重复初始化
         if (mInitialized) return
 
+        serverConnection.start()
         onStateChange(PlayState.INITIALIZING)
         //初始化各子播放器
         mPlayers.forEach {
