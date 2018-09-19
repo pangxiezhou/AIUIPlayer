@@ -36,6 +36,7 @@ dependencies {
     implementation 'fm.qingting.open.android:qtsdkplayer:0.2.0'
     implementation 'fm.qingting.open.android:qtsdk:1.0.2'
     implementation project(":player_init")
+    implementation project(":player_common")
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
