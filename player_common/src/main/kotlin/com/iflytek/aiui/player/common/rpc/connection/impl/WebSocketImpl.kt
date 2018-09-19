@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.common.rpc.connection.impl
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.handshake.ServerHandshake
 import org.java_websocket.server.WebSocketServer
@@ -10,33 +11,25 @@ import java.net.InetSocketAddress
 import java.net.URI
 import java.util.*
 
-abstract class ServerConnectionListener {
-    open fun onStart() {
+typealias ServerInitializer = (Int) -> WebSocketServer
+typealias ClientInitializer = (String, Int) -> WebSocketClient
 
-    }
-}
-
-abstract class ClientConnectionListener {
-    open fun onOpen() {
-
-    }
-
-    open fun onClose() {
-
-    }
-}
-
-class WebSocketServerConnection(private val port: Int, val connectionListener: ServerConnectionListener) : DataConnection() {
+class WebSocketServerConnection(private val port: Int) : DataConnection() {
     private lateinit var server: WebSocketServer
-
-    private fun initServer() {
-        server = object : WebSocketServer(InetSocketAddress(port)) {
+    private var serverInitializer: ServerInitializer = { port ->
+        object : WebSocketServer(InetSocketAddress(port)) {
             override fun onOpen(conn: WebSocket?, handshake: ClientHandshake?) {
-                println("server on client connected")
+//                println("server on client connected")
+                if (connections.size == 1) {
+                    onActive()
+                }
             }
 
             override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
-                println("server on client disconnected")
+//                println("server on client disconnected")
+                if (connections.isEmpty()) {
+                    onDeactivate()
+                }
             }
 
             override fun onMessage(conn: WebSocket?, message: String?) {
@@ -44,14 +37,18 @@ class WebSocketServerConnection(private val port: Int, val connectionListener: S
             }
 
             override fun onStart() {
-                println("server on Start")
-                connectionListener.onStart()
+//                println("server on Start")
+                this@WebSocketServerConnection.onStart()
             }
 
             override fun onError(conn: WebSocket?, ex: Exception?) {
                 println("server on error $ex")
             }
         }
+    }
+
+    private fun initServer() {
+        server = serverInitializer(port)
     }
 
     override fun start() {
@@ -63,48 +60,52 @@ class WebSocketServerConnection(private val port: Int, val connectionListener: S
         server.stop()
     }
 
-    override fun send(data: String) {
-        server.broadcast(data)
+    override fun send(data: String): Boolean {
+        return try {
+            server.broadcast(data)
+            true
+        } catch (e: WebsocketNotConnectedException) {
+            false
+        }
     }
 
 }
 
-class WebSocketClientConnection(private val host: String, private val port: Int, val connectionListener: ClientConnectionListener) : DataConnection() {
-    private val sendQueue = mutableListOf<String>()
+class WebSocketClientConnection(private val host: String, private val port: Int) : DataConnection() {
     private lateinit var client: WebSocketClient
+    private var stopped = false
+    private var clientInitializer: ClientInitializer = { host, port ->
+        object : WebSocketClient(URI("ws://$host:$port")) {
+            override fun onOpen(handshakedata: ServerHandshake?) {
+//                println("on Open")
+                onActive()
+            }
 
-    private fun initClient() {
-        client = object : WebSocketClient(URI("ws://$host:$port")) {
-        override fun onOpen(handshakedata: ServerHandshake?) {
-            println("on Open")
-            connectionListener.onOpen()
-            if (!sendQueue.isEmpty()) {
-                sendQueue.removeAll {
-                    send(it)
-                    true
+            override fun onClose(code: Int, reason: String?, remote: Boolean) {
+//                println("On Close")
+                onDeactivate()
+                if(!stopped) {
+                    Timer().schedule(object : TimerTask() {
+                        override fun run() {
+//                            println("start reconnect")
+                            reconnect()
+                        }
+                    }, 100)
                 }
             }
-        }
 
-        override fun onClose(code: Int, reason: String?, remote: Boolean) {
-            println("On Close")
-            connectionListener.onClose()
-            Timer().schedule(object: TimerTask() {
-                override fun run() {
-                    reconnect()
-                }
-            }, 100)
-            println("start reconnect")
-        }
+            override fun onMessage(message: String?) {
+                onData(message)
+            }
 
-        override fun onMessage(message: String?) {
-            onData(message)
-        }
-
-        override fun onError(ex: Exception?) {
-            println("onError $ex")
+            override fun onError(ex: Exception?) {
+                println("onError $ex")
+            }
         }
     }
+
+    private fun initClient() {
+        client = clientInitializer(host, port)
     }
 
     override fun start() {
@@ -112,15 +113,17 @@ class WebSocketClientConnection(private val host: String, private val port: Int,
         client.connect()
     }
 
-    override fun send(data: String) {
-        if (!client.isOpen) {
-            sendQueue.add(data)
-        } else {
+    override fun send(data: String): Boolean {
+        return try {
             client.send(data)
+            true
+        } catch (e: WebsocketNotConnectedException) {
+            false
         }
     }
 
     override fun stop() {
+        stopped = true
         client.close()
     }
 }
