@@ -2,7 +2,7 @@ package com.iflytek.aiui.player.auth.sample
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.iflytek.aiui.player.auth.login.AuthRPC
+import com.iflytek.aiui.player.auth.PlayerRemote
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,6 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        AuthRPC.init(this)
+        PlayerRemote.init(this)
     }
 }
