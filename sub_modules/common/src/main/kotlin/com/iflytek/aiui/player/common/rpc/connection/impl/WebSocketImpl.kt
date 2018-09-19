@@ -3,7 +3,6 @@ package com.iflytek.aiui.player.common.rpc.connection.impl
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
-import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.handshake.ServerHandshake
 import org.java_websocket.server.WebSocketServer
@@ -49,6 +48,7 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
 
     private fun initServer() {
         server = serverInitializer(port)
+        server.isReuseAddr = true
     }
 
     override fun start() {
