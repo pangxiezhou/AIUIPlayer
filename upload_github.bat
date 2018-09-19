@@ -28,8 +28,8 @@ git branch | find "* master" > NUL & IF ERRORLEVEL 1 (
 	
 	echo 3. 删除敏感文件
 	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch doc" --prune-empty --tag-name-filter cat
-	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch player_init/src/main/cpp" --prune-empty --tag-name-filter cat 
-	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch player_init/CMakeLists.txt" --prune-empty --tag-name-filter cat 
+	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/src/main/cpp" --prune-empty --tag-name-filter cat
+	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/CMakeLists.txt" --prune-empty --tag-name-filter cat
 
 	echo 4. 添加github remote
 	git remote | find "github_origin" > NUL & IF ERRORLEVEL 0 (
