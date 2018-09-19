@@ -1,6 +1,5 @@
 package com.iflytek.aiui.player.common.rpc.connection
 
-import java.util.*
 
 typealias DataCallback = (String?) -> Unit
 
@@ -15,6 +14,8 @@ abstract class DataConnection {
         callbacks.forEach { it.invoke(data) }
     }
 
+    abstract fun start()
+    abstract fun stop()
     abstract fun send(data: String)
 }
 
