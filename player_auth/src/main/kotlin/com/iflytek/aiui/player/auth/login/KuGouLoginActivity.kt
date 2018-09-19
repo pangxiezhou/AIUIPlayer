@@ -16,7 +16,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import com.iflytek.aiui.player.common.rpc.method.GetToken
-import com.iflytek.aiui.player.init.PlayerInitializer
+import com.iflytek.aiui.player.init.ThirdPartyPlayers
 
 import com.iflytek.aiui.player_auth.R
 import com.kugou.kgmusicsdk.IKGMusicHttpResp
@@ -40,7 +40,7 @@ class KuGouLoginActivity : AppCompatActivity() {
 
         tokenReq = intent.getParcelableExtra("request")
 
-        PlayerInitializer.initKuGouMusic()
+        ThirdPartyPlayers.initKuGouMusic()
 
         setContentView(R.layout.activity_kugou_login)
         sms_code.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->

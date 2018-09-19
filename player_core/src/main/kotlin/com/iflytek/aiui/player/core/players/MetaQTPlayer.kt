@@ -6,7 +6,7 @@ import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.core.MetaInfo
-import com.iflytek.aiui.player.init.PlayerInitializer
+import com.iflytek.aiui.player.init.ThirdPartyPlayers
 import fm.qingting.qtsdk.callbacks.QTCallback
 
 //蜻蜓FM初始化接口，方便测试需要
@@ -29,7 +29,7 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
         if(!mQTSDKInitialized) {
             QTSDK.Debug  = true
             QTSDK.setHost("https://open.staging.qingting.fm")
-            PlayerInitializer.initQTFM(context)
+            ThirdPartyPlayers.initQTFM(context)
             QTSDK.setAuthRedirectUrl("http://qttest.qingting.fm")
             QTPlay.initial(QTCallback { success, _ ->
                 if(success) {
