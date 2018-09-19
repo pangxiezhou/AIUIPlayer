@@ -1,1 +1,12 @@
-include ':sample_player', ':player_core', ':player_auth', ':thirdparty-players', ':player_common', ':sample_auth'
+String[] submodules = [':common', ':thirdparty-players', ':player', ':remote']
+include ':sample_player', ':sample_remote'
+include(submodules)
+
+
+submodules.each { module ->
+    project(module).projectDir = file("sub_modules/${module.substring(1)}")
+}
+
+
+
+
