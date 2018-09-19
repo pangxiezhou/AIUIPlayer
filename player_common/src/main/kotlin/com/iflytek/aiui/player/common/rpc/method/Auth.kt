@@ -3,10 +3,8 @@ package com.iflytek.aiui.player.common.rpc.method
 import org.json.JSONObject
 
 
-class GetToken {
+class GetToken(from: String?, serializeData: String? = null): Request(serializeData){
     companion object {
-        var lastID = 0
-
         fun forSource(source: String): GetToken {
            return GetToken(source)
         }
@@ -17,44 +15,14 @@ class GetToken {
     }
 
 
-    val id: Int
     val source: String?
 
-    private constructor(source: String?, serializeData: String? = null) {
-        if(source != null) {
-            this.source = source
-            id = (++lastID) % 10000
-        } else {
-            val data = JSONObject(serializeData)
-            this.source = data.optJSONObject("params")?.optString("source")
-            this.id = data.optInt("id")
-        }
+    init {
+        source = from ?:  JSONObject(serializeData).optJSONObject("params")?.optString("source")
+        addParams("source", source!!)
     }
 
-
-    fun toJSONString():String {
-       val description = JSONObject()
-
-        val params = JSONObject()
-        params.put("source", source)
-
-        description.put("jsonrpc", "2.0")
-        description.put("id", id)
-        description.put("method", "getAuth")
-        description.put("params", params)
-
-        return description.toString()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return if(other !is GetToken) {
-           false
-        } else {
-           source == other.source && id == other.id
-        }
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode() + (source?.hashCode() ?: 0)
+    override fun methodName(): String {
+        return "getAuth"
     }
 }
