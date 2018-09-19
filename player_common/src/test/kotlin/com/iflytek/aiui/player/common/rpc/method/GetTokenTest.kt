@@ -1,5 +1,6 @@
-package com.iflytek.aiui.player.common.rpc
+package com.iflytek.aiui.player.common.rpc.method
 
+import com.iflytek.aiui.player.common.rpc.method.GetToken
 import org.json.JSONObject
 import org.junit.Test
 import kotlin.test.assertEquals
