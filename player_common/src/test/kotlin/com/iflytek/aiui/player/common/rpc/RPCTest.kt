@@ -1,7 +1,6 @@
 package com.iflytek.aiui.player.common.rpc
 
-import com.iflytek.aiui.player.common.rpc.connection.impl.ClientConnectionListener
-import com.iflytek.aiui.player.common.rpc.connection.impl.ServerConnectionListener
+import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
 import com.iflytek.aiui.player.common.rpc.method.GetToken
@@ -19,7 +18,8 @@ class RPCTest {
     fun setUp() {
         //Server和Client Connection建立
         val countStartDown = CountDownLatch(1)
-        server = WebSocketServerConnection(port, object : ServerConnectionListener() {
+        server = WebSocketServerConnection(port)
+        server.registerConnectionListener(object: ConnectionListener() {
             override fun onStart() {
                 countStartDown.countDown()
             }
@@ -28,8 +28,9 @@ class RPCTest {
         countStartDown.await()
 
         val countConnectionDown = CountDownLatch(1)
-        client = WebSocketClientConnection("localhost", port, object : ClientConnectionListener() {
-            override fun onOpen() {
+        client = WebSocketClientConnection("localhost", port)
+        client.registerConnectionListener(object: ConnectionListener() {
+            override fun onActive() {
                 countConnectionDown.countDown()
             }
         })
@@ -52,7 +53,6 @@ class RPCTest {
                 val req = GetToken.deserializeFrom(data)
                 rpc.response(req, fakeToken)
             }
-
         })
 
         serverRPC.request<String>(GetToken.forSource("qingting")) { token ->
