@@ -12,13 +12,22 @@ import org.json.JSONObject
 
 object PlayerRemote {
     private var rpc: RPC? = null
+    private var connection: WebSocketClientConnection? = null
+    private var stopOnDestroy = false
 
     val rpcProxy
         get() = rpc
 
-    fun init(context: Context) {
-        val connection = WebSocketClientConnection("localhost", 4096)
-        rpc = RPC(connection, object : RPCListener {
+    fun init(context: Context, host: String? = null) {
+        val connection = WebSocketClientConnection(host ?: "localhost", 4096)
+        init(context, connection)
+        stopOnDestroy = true
+    }
+
+    fun init(context: Context, connection: WebSocketClientConnection) {
+        stopOnDestroy = false
+        this.connection = connection
+        rpc = RPC(connection!!, object : RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
                 val req = JSONObject(data)
                 when (req.optString("method")) {
@@ -36,5 +45,12 @@ object PlayerRemote {
             }
         })
         connection.start()
+    }
+
+    fun destroy() {
+        if(stopOnDestroy) {
+            connection?.stop()
+        }
+        rpc?.reset()
     }
 }
