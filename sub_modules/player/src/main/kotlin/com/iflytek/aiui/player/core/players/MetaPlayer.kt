@@ -2,7 +2,7 @@ package com.iflytek.aiui.player.core.players
 
 import android.support.annotation.CallSuper
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 
 
 enum class MetaState {
@@ -85,11 +85,11 @@ abstract class MetaAbstractPlayer(protected val rpc: RPC) {
         if (mState != MetaState.IDLE) listener.onReady()
     }
 
-    abstract fun canDispose(item: MetaInfo): Boolean
+    abstract fun canDispose(item: MetaItem): Boolean
     /**
      * 播放单项内容
      */
-    abstract fun play(info: MetaInfo)
+    abstract fun play(info: MetaItem)
 
     /**
      * 暂停播放

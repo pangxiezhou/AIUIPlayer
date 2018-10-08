@@ -165,12 +165,12 @@ class AIUIPlayerTest {
 
     private fun before(autoPlaying: Boolean = true) {
         whenever(qtPlayer.canDispose(any())).then {
-            val canDispose = it.getArgument<MetaInfo>(0).source== "qingtingfm"
+            val canDispose = it.getArgument<MetaItem>(0).source== "qingtingfm"
             canDispose
         }
 
         whenever(qtPlayer.play(any())).then {
-            val canDispose = it.getArgument<MetaInfo>(0).source== "qingtingfm"
+            val canDispose = it.getArgument<MetaItem>(0).source== "qingtingfm"
             if(autoPlaying && canDispose) {
                 qtPlayerListener.onStateChange(MetaState.LOADING)
                 qtPlayerListener.onStateChange(MetaState.PLAYING)
@@ -180,12 +180,12 @@ class AIUIPlayerTest {
 
 
         whenever(mediaPlayer.canDispose(any())).then {
-            val canDispose = !it.getArgument<MetaInfo>(0).url.isEmpty()
+            val canDispose = !it.getArgument<MetaItem>(0).url.isEmpty()
             canDispose
         }
 
         whenever(mediaPlayer.play(any())).then {
-            val canDispose = !it.getArgument<MetaInfo>(0).url.isEmpty()
+            val canDispose = !it.getArgument<MetaItem>(0).url.isEmpty()
             if(autoPlaying && canDispose) {
                 mediaPlayerListener.onStateChange(MetaState.LOADING)
                 mediaPlayerListener.onStateChange(MetaState.PLAYING)
@@ -578,7 +578,7 @@ class AIUIPlayerTest {
         assertEquals(player.currentState, PlayState.ERROR)
     }
 
-    private fun constructMetaInfo(source: JSONArray, index: Int): MetaInfo {
-        return MetaInfo(source.optJSONObject(index), SERVICE_STORY)
+    private fun constructMetaInfo(source: JSONArray, index: Int): MetaItem {
+        return MetaItem(source.optJSONObject(index), SERVICE_STORY)
     }
 }
