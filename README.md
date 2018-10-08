@@ -2,11 +2,11 @@
 
 AIUIPlayer是用于解析播放AIUI语义结果中音频资源的播放器。
 
-## 1. 问题
+## 1. 起因
 
 AIUI语义结果的部分信源的音频资源在升级后不再直接返回可播放的音频URL，而是需要依用对应信源方的SDK才能解析播放。
 
-举个例子，故事技能在未升级前返回结果如下：
+举个例子，故事技能的蜻蜓信源在未升级前返回结果如下：
 
 ``` json
 {
@@ -18,7 +18,7 @@ AIUI语义结果的部分信源的音频资源在升级后不再直接返回可�
 }
 ```
 
-改变后的结果：
+升级后的结果如下：
 
 ``` json
 {
@@ -33,9 +33,9 @@ AIUI语义结果的部分信源的音频资源在升级后不再直接返回可�
 
 音频资源不再直接返回可播放的url，而是通过新增的source字段指明信源，resourceId提供特定于信源方的音频信息。
 
-上面这条结果，qingtingfm表明信源方是蜻蜓FM，而resourceId就是"channelId, programId"。蜻蜓FM的SDK中的QTPlayer播放器提供了prepare(channelId, programId)接口播放此类资源。
+上面这条结果，qingtingfm表明信源方是蜻蜓FM，resourceId是"channelId, programId"的形式，而蜻蜓FM的SDK中的QTPlayer播放器提供了prepare(channelId, programId)接口播放此类资源。
 
-## 2. 解决办法
+## 2. 方案
 
 AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据音频资源的source字段，调用不同信源方的SDK进行实际的播放、授权和控制。
 
@@ -49,43 +49,47 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 
 ### 2.1 模块介绍
 
-root
+.
 
-​	sample_player   // 播放器示例
++---- sample_player   // 播放器集成调用示例
 
-​	sample_remote  // 控制器示例
++---- sample_remote  // 控制器集成调用示例
 
-​	sub_modules
++---- sub_modules
 
-​		common // 公共依赖
+​      +---- common   // 公共依赖
 
-​		player // 播放器
+​      +---- player       // 播放器library
 
-​		remote //控制器
+​      +---- remote     //控制器library
 
-​		thirdparty-players // 第三方SDK播放器依赖
+​      +---- thirdparty-players // 第三方SDK播放器依赖
 
 
 
-### 2.2 控制器
+### 2.2 授权处理
 
-调用AIUIPlayer播放资源时，内部其实调用的是第三方SDK进行播放，而第三方SDK播放器（如酷狗）在播放前需要用户进行登录授权。
+调用AIUIPlayer播放资源时，在内部调用的是第三方SDK进行实际的播放，而一些第三方SDK播放器（如酷狗）在播放前需要用户进行登录授权。
 
-通过集成remote模块即可处理登录授权的请求。player模块在播放到需要授权的资源时将授权请求发送到remote模块，remote模块弹出对应授权界面，用户输入完成授权后将授权信息返回给player模块，player使用授权信息完成资源的继续播放。
+通过集成控制器模块即可处理登录授权的请求。播放器模块在播放到需要授权的资源时将授权请求发送到控制器模块，控制器模块弹出对应授权界面，用户输入完成授权后将授权信息返回给播放器模块，播放器模块使用授权信息完成资源的继续播放。
 
-player模块和remote模块可以集成在一个App内，该App既负责播放也负责授权，比较适用于手机App或者有屏的播放设备。
+![player&remote](pictures/player&remote.jpg)
+
+### 2.3 集成方式
+
+播放器模块和控制器模块可以集成在一个App内，该App既负责音频播放也负责授权处理，比较适用于手机App或者有屏的播放设备。
 
 ![AIUIPlayer单设备](pictures/单设备.jpg)
 
 
 
-player模块和remote模块也可以集成在不同设备上，例如无屏音箱集成player模块，对应的音箱手机客户端集成remote模块，这种情况下remote模块在初始化时需要指定播放设备的IP地址。
+播放器模块和控制器模块也可以集成在不同设备上，例如无屏音箱集成播放器模块，对应的音箱手机客户端集成控制器模块，这种情况下控制器模块在初始化时需要指定集成播放器模块的设备的IP地址。
 
 ![AIUIPlayer多设备](pictures/多设备.jpg)
 
 
 
-## 3. 使用方法
+## 3. 使用
 
 ### 3.1 项目配置
 
@@ -106,7 +110,7 @@ allprojects {
 }
 ```
 
-如果集成播放器，在app下的build.gradle加入player的依赖
+如果需要集成播放器，在app下的build.gradle加入player的依赖
 
 ``` groovy
 dependencies {
@@ -115,7 +119,7 @@ dependencies {
 }
 ```
 
-如果集成控制器，在app下的build.gradle加入remote的依赖
+如果需要集成控制器，在app下的build.gradle加入remote的依赖
 
 ```groovy
 dependencies {
@@ -128,13 +132,14 @@ dependencies {
 
 ### 3.2 接口调用
 
-#### 3.2.1 player接口调用示例
+#### 3.2.1 播放器接口调用示例
 
 ``` kotlin
     player = AIUIPlayer(this)
     player.addListener(object : PlayerListener {
         override fun onPlayerReady() {
             titleTxt.text = "初始化成功"
+          	//开始播放音频资源
             startPlaySamples()
         }
 
