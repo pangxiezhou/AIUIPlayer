@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.core.players
 import android.media.AudioManager
 import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
 typealias MediaPlayerInitializer = (MediaPlayerCallBack) -> Unit
@@ -38,7 +38,7 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         }
     }
 
-    override fun play(item: MetaInfo) {
+    override fun play(item: MetaItem) {
         mMediaPlayer.reset()
         mMediaPlayer.apply {
             stateChange(MetaState.LOADING)
@@ -74,5 +74,5 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         super.release()
     }
 
-    abstract fun retriveURL(item: MetaInfo, callback: URLRetriveCallback)
+    abstract fun retriveURL(item: MetaItem, callback: URLRetriveCallback)
 }

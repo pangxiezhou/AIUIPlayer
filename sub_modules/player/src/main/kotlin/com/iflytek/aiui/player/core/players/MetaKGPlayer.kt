@@ -4,7 +4,7 @@ import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.method.SourceType
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import com.iflytek.aiui.player.common.rpc.storage.Storage
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
 import com.kugou.common.utils.MusicJNI
 
@@ -49,7 +49,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         mKuGouAPI.init()
     }
 
-    override fun retriveURL(item: MetaInfo, callback: URLRetriveCallback) {
+    override fun retriveURL(item: MetaItem, callback: URLRetriveCallback) {
         val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
         when (url.errorNo) {
             0 -> {
@@ -69,7 +69,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         }
     }
 
-    private fun onTokenExpire(item: MetaInfo, callback: URLRetriveCallback) {
+    private fun onTokenExpire(item: MetaItem, callback: URLRetriveCallback) {
         val savedToken = storage.getString(tokenKey)
         val savedUserID = storage.getInteger(userIDKey)
         //首先用本地缓存token进行登录
@@ -99,7 +99,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         }
     }
 
-    override fun canDispose(item: MetaInfo): Boolean {
+    override fun canDispose(item: MetaItem): Boolean {
         if (item.source == "kugou") {
             val itemID = item.info.optString("itemid", "")
             if (!itemID.isEmpty()) {

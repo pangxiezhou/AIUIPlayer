@@ -5,12 +5,11 @@ import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCCallback
 import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
 import com.iflytek.aiui.player.common.rpc.storage.Storage
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
@@ -103,22 +102,22 @@ class MetaKGPlayerTest {
     fun canDispose() {
         setUp()
 
-        assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertTrue(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "1234567889"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingting",
                 "itemid" to "1234567889"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "playUrl" to "http://fake.url/test.mp3"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to ""
         )), "story")))
@@ -129,7 +128,7 @@ class MetaKGPlayerTest {
         setUp()
 
         val itemID = "1234567889"
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to itemID
         )), "story"))
@@ -161,7 +160,7 @@ class MetaKGPlayerTest {
         }
 
         val itemId = "112358132134"
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to itemId
         )), "story"))
@@ -170,7 +169,7 @@ class MetaKGPlayerTest {
         verify(mKuGouAPI).login(fakeUserID, fakeToken)
 
         clearInvocations(mRPC, mKuGouAPI)
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to itemId
         )), "story"))
@@ -181,7 +180,7 @@ class MetaKGPlayerTest {
 
         clearInvocations(mRPC, mKuGouAPI)
         hasLogin = false
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to itemId
         )), "story"))
@@ -194,7 +193,7 @@ class MetaKGPlayerTest {
         clearInvocations(mRPC, mKuGouAPI)
         hasLogin = false
         storageMap.clear()
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to itemId
         )), "story"))
@@ -219,7 +218,7 @@ class MetaKGPlayerTest {
             true
         }
 
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "112358132134"
         )), "story"))
@@ -229,7 +228,7 @@ class MetaKGPlayerTest {
 
 
         clearInvocations(mRPC, mKuGouAPI)
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "112358132134"
         )), "story"))
@@ -239,7 +238,7 @@ class MetaKGPlayerTest {
 
         clearInvocations(mRPC, mKuGouAPI)
         errorCallback?.invoke(-1, "rpc peer reset")
-        player.play(MetaInfo(JSONObject(hashMapOf(
+        player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "112358132134"
         )), "story"))

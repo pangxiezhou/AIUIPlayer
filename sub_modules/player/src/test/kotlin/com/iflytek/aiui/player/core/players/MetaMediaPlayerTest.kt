@@ -1,7 +1,7 @@
 package com.iflytek.aiui.player.core.players
 
 import android.media.MediaPlayer
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONObject
 import org.junit.Test
@@ -67,14 +67,14 @@ class MetaMediaPlayerTest {
         )
         assertTrue(player.canDispose(urlItem))
 
-        val qingtingItem = MetaInfo(JSONObject(hashMapOf(
+        val qingtingItem = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "name" to "河马当保姆",
                 "resourceId" to "123, 456"
         )), "story")
         assertFalse(player.canDispose(qingtingItem))
 
-        val mixItem = MetaInfo(JSONObject(hashMapOf(
+        val mixItem = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "name" to "河马当保姆",
                 "playUrl" to "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214",
@@ -148,13 +148,13 @@ class MetaMediaPlayerTest {
         verify(listener).onRelease()
     }
 
-    private fun constructItem(name: String, url: String): MetaInfo {
+    private fun constructItem(name: String, url: String): MetaItem {
         val mapInfo = mutableMapOf(
                 "name" to name,
                 "playUrl" to url
         )
 
-        return MetaInfo(JSONObject(mapInfo), "story")
+        return MetaItem(JSONObject(mapInfo), "story")
     }
 }
 

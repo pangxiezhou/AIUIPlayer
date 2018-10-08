@@ -52,7 +52,7 @@ enum class PlayState {
 /**
  * 播放器可接受的播放项
  */
-data class MetaInfo(val info: JSONObject, val service: String) {
+data class MetaItem(val info: JSONObject, val service: String) {
     val source: String = info.optString("source")
     val title: String
     val author: String
@@ -121,7 +121,7 @@ data class MetaInfo(val info: JSONObject, val service: String) {
 
 
     override fun equals(other: Any?): Boolean {
-        return if (other is MetaInfo) {
+        return if (other is MetaItem) {
             info == other.info && service == other.service
         } else {
             false
@@ -146,7 +146,7 @@ interface PlayerListener {
     /**
      * 播放内容变化回调，直接调用next，previous或播放结束自动切换到下一首
      */
-    fun onMediaChange(item: MetaInfo)
+    fun onMediaChange(item: MetaItem)
 
     /**
      * 播放器已销毁
@@ -174,7 +174,7 @@ class AIUIPlayer(context: Context) {
     //默认初始化状态
     private var mState: PlayState = PlayState.IDLE
     //播放列表内容
-    private var mData = mutableListOf<MetaInfo>()
+    private var mData = mutableListOf<MetaItem>()
     private var mIndex = 0
     private var positiveDirection = true
     //初始化标识，避免重复初始化
@@ -185,7 +185,7 @@ class AIUIPlayer(context: Context) {
 
 
     //当前播放项内容
-    val currentPlay: MetaInfo?
+    val currentPlay: MetaItem?
         get() {
             return if (mIndex !in 0 until mData.size) {
                 null
@@ -281,7 +281,7 @@ class AIUIPlayer(context: Context) {
     fun anyAvailablePlay(data: JSONArray, service: String): Boolean {
         for (i in 0 until data.length()) {
             if (mPlayers.any {
-                        it.canDispose(MetaInfo(data.optJSONObject(i), service))
+                        it.canDispose(MetaItem(data.optJSONObject(i), service))
                     }) {
                 return true
             }
@@ -305,7 +305,7 @@ class AIUIPlayer(context: Context) {
         mActivePlayer?.pause()
         mData = mutableListOf()
         for (i in 0 until data.length()) {
-            mData.add(MetaInfo(data.optJSONObject(i), service))
+            mData.add(MetaItem(data.optJSONObject(i), service))
         }
         mIndex = -1
         mAutoSkipError = autoSkip
@@ -413,7 +413,7 @@ class AIUIPlayer(context: Context) {
         }
     }
 
-    private fun onItemChange(item: MetaInfo) {
+    private fun onItemChange(item: MetaItem) {
         mListeners.forEach {
             it.onMediaChange(item)
         }
