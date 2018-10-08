@@ -1,7 +1,7 @@
 package com.iflytek.aiui.player.core.players
 
 import android.test.mock.MockContext
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.nhaarman.mockitokotlin2.*
 import fm.qingting.qtsdk.player.QTPlayer
 import org.json.JSONObject
@@ -31,7 +31,7 @@ class MetaQTPlayerTest {
     @InjectMocks
     private val player: MetaQTPlayer = MetaQTPlayer(MockContext(), mock())
 
-    private val validItem = MetaInfo(JSONObject(hashMapOf(
+    private val validItem = MetaItem(JSONObject(hashMapOf(
             "source" to "qingtingfm",
             "resourceId" to "1234,5678"
     )), "story")
@@ -73,27 +73,27 @@ class MetaQTPlayerTest {
 
     @Test
     fun canDispose() {
-        assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertTrue(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123, 456"
         )), "story")))
 
-        assertTrue(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertTrue(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "123"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "0.1, 0.54"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "playUrl" to "http://fake.url/test.mp3"
         )), "story")))
 
-        assertFalse(player.canDispose(MetaInfo(JSONObject(hashMapOf(
+        assertFalse(player.canDispose(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "resourceId" to "123, 456"
         )), "story")))
@@ -103,7 +103,7 @@ class MetaQTPlayerTest {
     fun playProgram() {
         val channelId = 123
         var programId = 456
-        var item = MetaInfo(JSONObject(hashMapOf(
+        var item = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId, $programId"
         )), "story")
@@ -116,7 +116,7 @@ class MetaQTPlayerTest {
     @Test
     fun playChannel() {
         val channelId = 123
-        var item = MetaInfo(JSONObject(hashMapOf(
+        var item = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId"
         )), "radio")

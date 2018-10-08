@@ -5,7 +5,7 @@ import fm.qingting.qtsdk.play.QTPlay
 import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 import fm.qingting.qtsdk.callbacks.QTCallback
 
@@ -82,7 +82,7 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
     }
 
 
-    override fun play(info: MetaInfo) {
+    override fun play(info: MetaItem) {
         val data = info.info
         //通过resourceId字段拆分出channelID和ProgramID
         //完整广播节目只包含ChannelID
@@ -125,7 +125,7 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
         super.release()
     }
 
-    override fun canDispose(item: MetaInfo): Boolean {
+    override fun canDispose(item: MetaItem): Boolean {
         if (item.source == "qingtingfm") {
             val resourceId = item.info.optString("resourceId", "")
             if (!resourceId.isEmpty()) {
