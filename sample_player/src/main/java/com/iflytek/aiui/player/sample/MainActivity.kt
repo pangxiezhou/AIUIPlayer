@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.iflytek.aiui.aiuiplayer.R
 import com.iflytek.aiui.player.core.AIUIPlayer
-import com.iflytek.aiui.player.core.MetaInfo
+import com.iflytek.aiui.player.core.MetaItem
 import com.iflytek.aiui.player.core.PlayState
 import com.iflytek.aiui.player.core.PlayerListener
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onMediaChange(item: MetaInfo) {
+            override fun onMediaChange(item: MetaItem) {
                 //根据播放项变化回调修改title内容
                 titleTxt.text = item.title
             }
