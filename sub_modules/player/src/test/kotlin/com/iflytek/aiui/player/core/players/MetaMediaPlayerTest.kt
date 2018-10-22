@@ -49,6 +49,8 @@ class MetaMediaPlayerTest {
             onPrepareListener.onPrepared(mediaPlayer)
         }
 
+        whenever(mediaPlayer.isPlaying).thenReturn(true)
+
         player.initialize()
         player.addListener(listener)
     }
