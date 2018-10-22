@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.common.rpc
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
+import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.method.SourceType
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.junit.After

@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.core.players
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.method.SourceType
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
-import com.iflytek.aiui.player.common.rpc.storage.Storage
+import com.iflytek.aiui.player.common.storage.Storage
 import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
 import com.kugou.common.utils.MusicJNI

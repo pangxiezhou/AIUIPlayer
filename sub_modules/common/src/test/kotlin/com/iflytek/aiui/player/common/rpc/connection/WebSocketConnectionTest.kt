@@ -65,7 +65,7 @@ class WebSocketConnectionTest {
         val firstCountDataDown = CountDownLatch(1)
         server.registerConnectionListener(listener)
         server.registerConnectionListener(object : ConnectionListener() {
-            override fun onData(data: String) {
+            override fun onData(message: String) {
                 firstCountDataDown.countDown()
             }
         })
@@ -80,7 +80,7 @@ class WebSocketConnectionTest {
         val secondCountDataDown = CountDownLatch(1)
         server.removeConnectionListener(listener)
         server.registerConnectionListener(object: ConnectionListener() {
-            override fun onData(data: String) {
+            override fun onData(message: String) {
                 secondCountDataDown.countDown()
             }
         })
@@ -94,7 +94,7 @@ class WebSocketConnectionTest {
         val thirdCountDataDown = CountDownLatch(1)
         server.registerConnectionListener(listener)
         server.registerConnectionListener(object: ConnectionListener() {
-            override fun onData(data: String) {
+            override fun onData(message: String) {
                 thirdCountDataDown.countDown()
             }
         })
@@ -162,16 +162,16 @@ class WebSocketConnectionTest {
 
         val countServerRecvDown = CountDownLatch(1)
         server.registerConnectionListener(object: ConnectionListener() {
-            override fun onData(data: String) {
-                assertEquals(data, clientContent)
+            override fun onData(message: String) {
+                assertEquals(message, clientContent)
                 countServerRecvDown.countDown()
             }
         })
 
         val countClientRecvDown = CountDownLatch(1)
         client.registerConnectionListener(object: ConnectionListener() {
-            override fun onData(data: String) {
-                assertEquals(data, serverContent)
+            override fun onData(message: String) {
+                assertEquals(message, serverContent)
                 countClientRecvDown.countDown()
             }
         })

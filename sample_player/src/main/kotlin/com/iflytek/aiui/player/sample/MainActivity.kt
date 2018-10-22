@@ -21,10 +21,6 @@ class MainActivity : AppCompatActivity() {
 
         player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
-            override fun onError(error: Int, info: String) {
-                titleTxt.text = "播放错误 $error $info"
-            }
-
             override fun onPlayerReady() {
                 titleTxt.text = "初始化成功"
                 startPlaySamples()
@@ -33,13 +29,17 @@ class MainActivity : AppCompatActivity() {
             override fun onStateChange(state: PlayState) {
                 when (state) {
                     PlayState.PLAYING -> ToggleBtn.text = "暂停"
-                    PlayState.PAUSED -> ToggleBtn.text = "继续"
+                    PlayState.PAUSED,PlayState.COMPLETE -> ToggleBtn.text = "继续"
                 }
             }
 
             override fun onMediaChange(item: MetaItem) {
                 //根据播放项变化回调修改title内容
                 titleTxt.text = item.title
+            }
+
+            override fun onError(error: Int, info: String) {
+                titleTxt.text = "播放错误 $error $info"
             }
 
             override fun onPlayerRelease() {

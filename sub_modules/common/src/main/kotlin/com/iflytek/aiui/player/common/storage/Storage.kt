@@ -1,4 +1,4 @@
-package com.iflytek.aiui.player.common.rpc.storage
+package com.iflytek.aiui.player.common.storage
 
 import android.content.Context
 

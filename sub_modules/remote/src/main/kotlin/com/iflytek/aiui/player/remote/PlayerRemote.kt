@@ -1,8 +1,8 @@
-package com.iflytek.aiui.player.auth
+package com.iflytek.aiui.player.remote
 
 import android.content.Context
 import android.content.Intent
-import com.iflytek.aiui.player.auth.login.KuGouLoginActivity
+import com.iflytek.aiui.player.remote.login.KuGouLoginActivity
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
