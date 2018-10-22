@@ -98,7 +98,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     fun reset() {
         sendQueue.clear()
         calls.removeAll {
-            it.error?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc reset")
+            it.error?.invoke(ErrorDef.ERROR_RPC_RESET, "rpc reset")
             true
         }
 

@@ -43,6 +43,14 @@ class TokenReqTest {
     }
 
     @Test
+    fun jsonDeserialize() {
+        val tokenReq = TokenReq.createFor( SourceType.QingTing)
+        val forkTokenReq = TokenReq.createFromJSON(tokenReq.toJSONString())
+
+        assertEquals(tokenReq, forkTokenReq)
+    }
+
+    @Test
     fun parcelDeserialize() {
         //mock Parcel
         var parcelStr = ""
@@ -60,13 +68,5 @@ class TokenReqTest {
         val deserializeReq = TokenReq.createFromParcel(parcel)
 
         assertEquals(req, deserializeReq)
-    }
-
-    @Test
-    fun jsonDeserialize() {
-        val tokenReq = TokenReq.createFor( SourceType.QingTing)
-        val forkTokenReq = TokenReq.createFromJSON(tokenReq.toJSONString())
-
-        assertEquals(tokenReq, forkTokenReq)
     }
 }

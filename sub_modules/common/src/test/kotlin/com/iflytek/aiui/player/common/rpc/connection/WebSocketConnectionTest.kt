@@ -209,18 +209,4 @@ class WebSocketConnectionTest {
         assertTrue(server.active)
         assertTrue(client.active)
     }
-
-    @Ignore
-    @Test(timeout = 2000)
-    fun noReconnectWhenStop() {
-        client.stop()
-
-        val countClientDeactivateDown = CountDownLatch(1)
-        client.registerConnectionListener(object : ConnectionListener() {
-            override fun onDeactivate() {
-                countClientDeactivateDown.countDown()
-            }
-        })
-        countClientDeactivateDown.await()
-    }
 }
