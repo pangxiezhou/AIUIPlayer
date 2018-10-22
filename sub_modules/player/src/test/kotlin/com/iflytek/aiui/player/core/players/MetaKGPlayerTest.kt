@@ -238,11 +238,9 @@ class MetaKGPlayerTest {
     fun onlyOneActiveRequest() {
         setUp()
 
-        var callback: RPCCallback<String>? = null
         var errorCallback: RPCErrorCallback? = null
         whenever(mRPC.request<String>(any(), any(), any(), any())).then { it ->
             //只存储，不立即回调
-            callback = it.arguments[1] as RPCCallback<String>?
             errorCallback = it.arguments[2] as RPCErrorCallback
             true
         }
@@ -275,6 +273,33 @@ class MetaKGPlayerTest {
         verify(mRPC).request<String>(any(), any(), any(), any())
     }
 
+    @Test
+    fun tokenOnCurrent() {
+        setUp()
 
+        var callback: RPCCallback<String>? = null
+        whenever(mRPC.request<String>(any(), any(), any(), any())).then { it ->
+            //只存储，不立即回调
+            callback = it.arguments[1] as RPCCallback<String>
+            true
+        }
 
+        val firstItem = "112358132134"
+        player.play(MetaItem(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to firstItem
+        )), "story"))
+
+        val secondItem = "fake second hash"
+        player.play(MetaItem(JSONObject(hashMapOf(
+                "source" to "kugou",
+                "itemid" to secondItem
+        )), "story"))
+
+        clearInvocations(mKuGouAPI)
+        callback?.invoke("$fakeUserID#$fakeToken")
+
+        verify(mKuGouAPI).login(fakeUserID, fakeToken)
+        verify(mKuGouAPI).retrieveUrl(secondItem, 0)
+    }
 }
