@@ -21,6 +21,10 @@ class MainActivity : AppCompatActivity() {
 
         player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
+            override fun onError(error: Int, info: String) {
+                titleTxt.text = "播放错误 $error $info"
+            }
+
             override fun onPlayerReady() {
                 titleTxt.text = "初始化成功"
                 startPlaySamples()
