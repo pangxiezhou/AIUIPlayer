@@ -5,7 +5,7 @@ import fm.qingting.qtsdk.play.QTPlay
 import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
+import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.core.MetaItem
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 import fm.qingting.qtsdk.callbacks.QTCallback
