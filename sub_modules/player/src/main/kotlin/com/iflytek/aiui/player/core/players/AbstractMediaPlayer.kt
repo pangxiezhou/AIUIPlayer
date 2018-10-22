@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.core.MetaItem
+import timber.log.Timber
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
 typealias MediaPlayerInitializer = (MediaPlayerCallBack) -> Unit
@@ -28,6 +29,7 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
             mMediaPlayer.setOnErrorListener { _, _, error ->
                 if(error != 0) {
                     onError(ErrorDef.ERROR_MEDIA_PLAYER_ERROR, "Media Player Error $error")
+                    Timber.e("Media Player On Error $error")
                 }
                true
             }

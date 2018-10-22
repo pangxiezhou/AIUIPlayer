@@ -7,6 +7,7 @@ import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
 import com.kugou.common.utils.MusicJNI
+import timber.log.Timber
 
 class KuGouAPI {
     private var libraryLoaded = false
@@ -97,6 +98,7 @@ class MetaKGPlayer(rpc: RPC, private val storage: Storage) : AbstractMediaPlayer
                 }, { error, description ->
                     mRPCRequesting = false
                     onError(error, description)
+                    Timber.e("MetaKuGouPlayer On RPC Error $error $description")
                 })
             }
         }
