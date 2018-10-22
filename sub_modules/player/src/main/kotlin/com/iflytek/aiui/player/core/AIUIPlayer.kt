@@ -150,6 +150,11 @@ interface PlayerListener {
     fun onMediaChange(item: MetaItem)
 
     /**
+     * 错误回调
+     */
+    fun onError(error: Int, info: String)
+
+    /**
      * 播放器已销毁
      */
     fun onPlayerRelease()
@@ -215,6 +220,22 @@ class AIUIPlayer(context: Context) {
         mPlayers.forEach {
             it.initialize()
             it.addListener(object : MetaListener {
+                override fun onError(error: Int, description: String) {
+                    if (mAutoSkipError) {
+                        if (positiveDirection) {
+                            if (!next()) {
+                                onStateError(error, description)
+                            }
+                        } else {
+                            if (!previous()) {
+                                onStateError(error, description)
+                            }
+                        }
+                    } else {
+                        onStateError(error, description)
+                    }
+                }
+
                 override fun onReady() {
                     if (++mReadyCount == mPlayers.size) {
                         onStateChange(PlayState.READY)
@@ -242,21 +263,6 @@ class AIUIPlayer(context: Context) {
                             }
                         }
 
-                        MetaState.ERROR -> {
-                            if (mAutoSkipError) {
-                                if (positiveDirection) {
-                                    if (!next()) {
-                                        onStateChange(PlayState.ERROR)
-                                    }
-                                } else {
-                                    if (!previous()) {
-                                        onStateChange(PlayState.ERROR)
-                                    }
-                                }
-                            } else {
-                                onStateChange(PlayState.ERROR)
-                            }
-                        }
                     }
                 }
 
@@ -425,6 +431,15 @@ class AIUIPlayer(context: Context) {
         runMain {
             mListeners.forEach {
                 it.onStateChange(state)
+            }
+        }
+    }
+
+    private fun onStateError(error: Int, description: String) {
+        onStateChange(PlayState.ERROR)
+        runMain {
+            mListeners.forEach {
+                it.onError(error, description)
             }
         }
     }
