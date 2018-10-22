@@ -1,6 +1,7 @@
 package com.iflytek.aiui.player.core
 
 import android.content.Context
+import android.os.Handler
 import android.text.TextUtils
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCListener
@@ -161,6 +162,7 @@ interface PlayerListener {
  */
 
 class AIUIPlayer(context: Context) {
+    private var mainHandler = Handler(context.mainLooper)
     private var serverConnection:DataConnection = WebSocketServerConnection(4096)
     private var rpcServer = RPC(serverConnection, object: RPCListener {
         override fun onRequest(rpc: RPC, data: String) {
@@ -216,7 +218,9 @@ class AIUIPlayer(context: Context) {
                 override fun onReady() {
                     if (++mReadyCount == mPlayers.size) {
                         onStateChange(PlayState.READY)
-                        mListeners.forEach { it.onPlayerReady() }
+                        runMain {
+                            mListeners.forEach { it.onPlayerReady() }
+                        }
                     }
                 }
 
@@ -258,7 +262,9 @@ class AIUIPlayer(context: Context) {
 
                 override fun onRelease() {
                     if (--mReadyCount == 0) {
-                        mListeners.forEach { it.onPlayerRelease() }
+                        runMain {
+                            mListeners.forEach { it.onPlayerRelease() }
+                        }
                         onStateChange(PlayState.IDLE)
                     }
                 }
@@ -378,8 +384,10 @@ class AIUIPlayer(context: Context) {
     fun addListener(listener: PlayerListener) {
         mListeners.add(listener)
         if (mState != PlayState.IDLE && mState != PlayState.INITIALIZING) {
-            listener.onPlayerReady()
-            listener.onStateChange(PlayState.READY)
+            runMain {
+                listener.onPlayerReady()
+                listener.onStateChange(PlayState.READY)
+            }
         }
     }
 
@@ -399,6 +407,12 @@ class AIUIPlayer(context: Context) {
         mPlayers.forEach { it.release() }
     }
 
+    private fun runMain(action: () -> Unit) {
+        mainHandler.post {
+            action()
+        }
+    }
+
     private fun onComplete() {
         mIndex = mData.size - 1
         mActivePlayer?.pause()
@@ -408,14 +422,18 @@ class AIUIPlayer(context: Context) {
 
     private fun onStateChange(state: PlayState) {
         mState = state
-        mListeners.forEach {
-            it.onStateChange(state)
+        runMain {
+            mListeners.forEach {
+                it.onStateChange(state)
+            }
         }
     }
 
     private fun onItemChange(item: MetaItem) {
-        mListeners.forEach {
-            it.onMediaChange(item)
+        runMain {
+            mListeners.forEach {
+                it.onMediaChange(item)
+            }
         }
     }
 
