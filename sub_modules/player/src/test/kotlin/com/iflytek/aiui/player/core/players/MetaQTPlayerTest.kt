@@ -43,13 +43,13 @@ class MetaQTPlayerTest {
             null
         }
         whenever(qtPlayer.prepare(any(), any<Int>())).then {
-            stateListener?.onPlayStateChange(QTPlayer.PlayState.LOADING)
-            stateListener?.onPlayStateChange(QTPlayer.PlayState.PLAYING)
+            stateListener.onPlayStateChange(QTPlayer.PlayState.LOADING)
+            stateListener.onPlayStateChange(QTPlayer.PlayState.PLAYING)
         }
 
         whenever(qtPlayer.prepare(any())).then {
-            stateListener?.onPlayStateChange(QTPlayer.PlayState.LOADING)
-            stateListener?.onPlayStateChange(QTPlayer.PlayState.PLAYING)
+            stateListener.onPlayStateChange(QTPlayer.PlayState.LOADING)
+            stateListener.onPlayStateChange(QTPlayer.PlayState.PLAYING)
         }
 
         whenever(qtPlayer.pause()).then {
@@ -102,8 +102,8 @@ class MetaQTPlayerTest {
     @Test
     fun playProgram() {
         val channelId = 123
-        var programId = 456
-        var item = MetaItem(JSONObject(hashMapOf(
+        val programId = 456
+        val item = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId, $programId"
         )), "story")
@@ -116,7 +116,7 @@ class MetaQTPlayerTest {
     @Test
     fun playChannel() {
         val channelId = 123
-        var item = MetaItem(JSONObject(hashMapOf(
+        val item = MetaItem(JSONObject(hashMapOf(
                 "source" to "qingtingfm",
                 "resourceId" to "$channelId"
         )), "radio")

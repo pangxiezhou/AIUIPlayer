@@ -75,6 +75,7 @@
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:clickable="true"
+                    android:focusable="false"
                     android:scaleType="centerCrop"
                     android:layout_height="40dp" />
             </LinearLayout>
@@ -121,7 +122,6 @@
                         android:textColor="@color/dark_grey"
                         android:id="@+id/sms_countdown"
                         android:visibility="gone"
-                        android:text="30秒"
                         android:textSize="18sp"
                         android:gravity="center"
                         android:layout_width="match_parent"

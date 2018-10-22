@@ -112,7 +112,7 @@ class KuGouLoginActivity : AppCompatActivity() {
                     val data = jsonObject.optJSONObject("data")
                     val token = data.optString("token")
                     val userId = data.optInt("userid")
-                    if(tokenReq != null) {
+                    if (tokenReq != null) {
                         PlayerRemote.rpcProxy?.response(tokenReq!!, "$userId#$token")
                     }
                     this@KuGouLoginActivity.finish()
@@ -161,7 +161,7 @@ class KuGouLoginActivity : AppCompatActivity() {
     private fun refreshGraphicCode() {
         KGMusicSDK.sharedInstance().requestImgCodeEx(object : IKGMusicHttpResp {
             override fun onSuccess(jsonObject: JSONObject) {
-                if(jsonObject.optInt("status") == 1) {
+                if (jsonObject.optInt("status") == 1) {
                     val dataObject = jsonObject.optJSONObject("data")
                     mLastVerifyKey = dataObject.optString("verifykey")
                     val verifyCode = dataObject.optString("verifycode")
@@ -223,7 +223,7 @@ class KuGouLoginActivity : AppCompatActivity() {
                     mLastCountDownTask = mTimer.schedule(0, 1000) {
                         runOnUiThread {
                             countDown--
-                            if(countDown == 0) {
+                            if (countDown == 0) {
                                 sms_countdown.visibility = View.GONE
                                 req_sms_btn.visibility = View.VISIBLE
                                 req_sms_btn.text = "重新发送"
@@ -303,34 +303,27 @@ class KuGouLoginActivity : AppCompatActivity() {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-            login_form.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 0 else 1).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_form.visibility = if (show) View.GONE else View.VISIBLE
-                        }
-                    })
+        login_form.visibility = if (show) View.GONE else View.VISIBLE
+        login_form.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 0 else 1).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        login_form.visibility = if (show) View.GONE else View.VISIBLE
+                    }
+                })
 
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_progress.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 1 else 0).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-                        }
-                    })
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-        }
+        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+        login_progress.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 1 else 0).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+                    }
+                })
     }
 
     private fun showToast(message: String) {
@@ -340,18 +333,18 @@ class KuGouLoginActivity : AppCompatActivity() {
     }
 
 
-        private fun isMobileNO(phoneNumber: String): Boolean {
-            /**
-             * 判断字符串是否符合手机号码格式
-             * 移动号段: 134,135,136,137,138,139,147,150,151,152,157,158,159,170,178,182,183,184,187,188
-             * 联通号段: 130,131,132,145,155,156,170,171,175,176,185,186
-             * 电信号段: 133,149,153,170,173,177,180,181,189
-             */
-            // "[1]"代表下一位为数字可以是几，"[0-9]"代表可以为0-9中的一个，"[5,7,9]"表示可以是5,7,9中的任意一位,[^4]表示除4以外的任何一个,\\d{9}"代表后面是可以是0～9的数字，有9位。
-            val telRegex = Regex("^((13[0-9])|(14[579])|(15[^4])|(18[0-9])|(17[0135678]))\\d{8}$")
-            return if (TextUtils.isEmpty(phoneNumber))
-                false
-            else
-                phoneNumber.matches(telRegex)
-        }
+    private fun isMobileNO(phoneNumber: String): Boolean {
+        /**
+         * 判断字符串是否符合手机号码格式
+         * 移动号段: 134,135,136,137,138,139,147,150,151,152,157,158,159,170,178,182,183,184,187,188
+         * 联通号段: 130,131,132,145,155,156,170,171,175,176,185,186
+         * 电信号段: 133,149,153,170,173,177,180,181,189
+         */
+        // "[1]"代表下一位为数字可以是几，"[0-9]"代表可以为0-9中的一个，"[5,7,9]"表示可以是5,7,9中的任意一位,[^4]表示除4以外的任何一个,\\d{9}"代表后面是可以是0～9的数字，有9位。
+        val telRegex = Regex("^((13[0-9])|(14[579])|(15[^4])|(18[0-9])|(17[0135678]))\\d{8}$")
+        return if (TextUtils.isEmpty(phoneNumber))
+            false
+        else
+            phoneNumber.matches(telRegex)
+    }
 }

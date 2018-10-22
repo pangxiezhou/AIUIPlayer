@@ -1,12 +1,8 @@
 package com.iflytek.aiui.player.core
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Handler
-import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.common.error.ErrorDef
-import com.iflytek.aiui.player.common.storage.Storage
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray
@@ -23,75 +19,31 @@ import kotlin.test.assertTrue
 
 @RunWith(MockitoJUnitRunner::class)
 class AIUIPlayerTest {
-    private val SERVICE_STORY = "story"
+    private val serviceStory = "story"
 
     private lateinit var qtPlayerListener: MetaListener
     private lateinit var mediaPlayerListener: MetaListener
-    private val serverConnection: DataConnection = mock()
-    private val rpcServer: RPC = mock()
     private val qtPlayer: MetaQTPlayer = mock()
     private val mediaPlayer: MetaMediaPlayer = mock()
 
-    @Spy
-    private val mPlayers: List<MetaAbstractPlayer> = listOf(qtPlayer, mediaPlayer)
-
     @Mock
     private lateinit var mainHandler: Handler
+    private val mockContext = mock<Context>()
 
     @Mock
     private lateinit var listener: PlayerListener
-    @Mock
-    private lateinit var storage: Storage
-    private val mockContext = mock<Context>()
+
+    @Spy
+    private val mPlayers: List<MetaAbstractPlayer> = listOf(qtPlayer, mediaPlayer)
 
     @InjectMocks
     private val player = AIUIPlayer(mockContext)
 
     @Before
     fun setUp() {
-        val tempMap = hashMapOf<String, Any>()
-
-        whenever(storage.put(any(), any<String>())).then {
-            tempMap.put(it.arguments[0] as String , it.arguments[1])
-        }
-
-        whenever(storage.put(any(), any<Int>())).then {
-            tempMap.put(it.arguments[0] as String , it.arguments[1])
-        }
-
-        whenever(storage.getString(any())).then {
-            tempMap[it.arguments[0]] ?: ""
-        }
-
-        whenever(storage.getInteger(any())).then {
-            tempMap[it.arguments[0]] ?: 0
-        }
-
-        whenever(mockContext.getSharedPreferences(any(), any())).then {
-            mock<SharedPreferences>()
-        }
-
         whenever(mainHandler.post(any())).then {
             (it.arguments[0] as Runnable).run()
             null
-        }
-    }
-
-    private fun allPlayerReady() {
-        whenever(qtPlayer.addListener(any())).then {
-            qtPlayerListener = it.getArgument<MetaListener>(0)
-            qtPlayerListener.onReady()
-        }
-
-        whenever(mediaPlayer.addListener(any())).then {
-            mediaPlayerListener = it.getArgument<MetaListener>(0)
-            mediaPlayerListener.onReady()
-        }
-    }
-
-    private fun notAllPlayerReady() {
-        whenever(qtPlayer.addListener(any())).then {
-            it.getArgument<MetaListener>(0).onReady()
         }
     }
 
@@ -143,6 +95,25 @@ class AIUIPlayerTest {
                     "playUrl" to "http://fake.url/test.mp3"
             )))
     )
+
+    private fun allPlayerReady() {
+        whenever(qtPlayer.addListener(any())).then {
+            qtPlayerListener = it.getArgument<MetaListener>(0)
+            qtPlayerListener.onReady()
+        }
+
+        whenever(mediaPlayer.addListener(any())).then {
+            mediaPlayerListener = it.getArgument<MetaListener>(0)
+            mediaPlayerListener.onReady()
+        }
+    }
+
+    private fun notAllPlayerReady() {
+        whenever(qtPlayer.addListener(any())).then {
+            it.getArgument<MetaListener>(0).onReady()
+        }
+    }
+
 
     @Test
     fun initializeNotAllReady() {
@@ -213,7 +184,7 @@ class AIUIPlayerTest {
     @Test
     fun playMixType() {
         before(false)
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         val firstItem = constructMetaInfo(data, 0)
         verify(qtPlayer).play(firstItem)
@@ -230,7 +201,7 @@ class AIUIPlayerTest {
     fun playEmptyList() {
         before()
 
-        player.play(JSONArray(), SERVICE_STORY)
+        player.play(JSONArray(), serviceStory)
 
         assertNull(player.currentPlay)
         assertEquals(player.currentState, PlayState.READY)
@@ -240,26 +211,26 @@ class AIUIPlayerTest {
     fun playFalse() {
         before()
 
-        assertTrue(player.play(data, SERVICE_STORY))
+        assertTrue(player.play(data, serviceStory))
         //非READY状态 调用play false
-        assertFalse(player.play(data, SERVICE_STORY))
+        assertFalse(player.play(data, serviceStory))
         assertEquals(player.currentState, PlayState.PLAYING)
         assertEquals(player.currentPlay, constructMetaInfo(data, 0))
 
         //reset，可调用play
         player.reset()
-        assertTrue(player.play(data, SERVICE_STORY))
+        assertTrue(player.play(data, serviceStory))
         assertEquals(player.currentState, PlayState.PLAYING)
         assertEquals(player.currentPlay, constructMetaInfo(data, 0))
 
         //没有可播放项时 调用play false
         player.reset()
-        assertFalse(player.play(invalidData, SERVICE_STORY))
+        assertFalse(player.play(invalidData, serviceStory))
         assertEquals(player.currentState, PlayState.READY)
         assertNull(player.currentPlay)
 
         player.reset()
-        assertFalse(player.play(JSONArray(), SERVICE_STORY))
+        assertFalse(player.play(JSONArray(), serviceStory))
         assertEquals(player.currentState, PlayState.READY)
         assertNull(player.currentPlay)
     }
@@ -268,9 +239,9 @@ class AIUIPlayerTest {
     fun canPlay() {
         before()
 
-        assertTrue(player.anyAvailablePlay(data, SERVICE_STORY))
-        assertTrue(player.anyAvailablePlay(mixData, SERVICE_STORY))
-        assertFalse(player.anyAvailablePlay(invalidData, SERVICE_STORY))
+        assertTrue(player.anyAvailablePlay(data, serviceStory))
+        assertTrue(player.anyAvailablePlay(mixData, serviceStory))
+        assertFalse(player.anyAvailablePlay(invalidData, serviceStory))
     }
 
 
@@ -278,7 +249,7 @@ class AIUIPlayerTest {
     fun next() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         verify(listener).onStateChange(PlayState.PLAYING)
 
         val expectSecondItem = constructMetaInfo(data, 1)
@@ -317,7 +288,7 @@ class AIUIPlayerTest {
     fun previous() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
 
         //位于第一首，不能上一首操作
@@ -346,7 +317,7 @@ class AIUIPlayerTest {
     fun playMixUnablePlayType() {
         before()
 
-        player.play(mixData, SERVICE_STORY)
+        player.play(mixData, serviceStory)
 
         verify(listener, never()).onMediaChange(constructMetaInfo(mixData, 0))
         assertEquals(player.currentPlay,constructMetaInfo(mixData, 1))
@@ -372,7 +343,7 @@ class AIUIPlayerTest {
     fun pause() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         clearInvocations(listener, qtPlayer, mediaPlayer)
 
@@ -395,7 +366,7 @@ class AIUIPlayerTest {
     fun pauseLoading() {
         before(false)
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         qtPlayerListener.onStateChange(MetaState.LOADING)
 
         player.pause()
@@ -412,7 +383,7 @@ class AIUIPlayerTest {
     fun resume() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         player.pause()
 
         clearInvocations(listener)
@@ -435,7 +406,7 @@ class AIUIPlayerTest {
     fun autoResume() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         player.pause()
 
         clearInvocations(listener)
@@ -453,7 +424,7 @@ class AIUIPlayerTest {
     fun autoNext() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         clearInvocations(listener)
         qtPlayerListener.onStateChange(MetaState.COMPLETE)
@@ -468,7 +439,7 @@ class AIUIPlayerTest {
     @Test
     fun complete() {
         before()
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         qtPlayerListener.onStateChange(MetaState.COMPLETE)
         mediaPlayerListener.onStateChange(MetaState.COMPLETE)
@@ -488,7 +459,7 @@ class AIUIPlayerTest {
     @Test
     fun stop() {
         before()
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         clearInvocations(listener)
         player.reset()
@@ -496,7 +467,7 @@ class AIUIPlayerTest {
         assertEquals(player.currentState, PlayState.READY)
         verify(listener).onStateChange(PlayState.READY)
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         assertEquals(player.currentPlay, constructMetaInfo(data, 0))
         assertEquals(player.currentState, PlayState.PLAYING)
         verify(listener).onStateChange(PlayState.PLAYING)
@@ -505,7 +476,7 @@ class AIUIPlayerTest {
     @Test
     fun release() {
         before()
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         player.release()
 
@@ -524,7 +495,7 @@ class AIUIPlayerTest {
     fun listener() {
         before()
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
         verify(listener).onStateChange(PlayState.PLAYING)
 
         clearInvocations(listener)
@@ -543,7 +514,7 @@ class AIUIPlayerTest {
     fun autoSkipError() {
         before(false)
 
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
         qtPlayerListener.onError(ErrorDef.ERROR_QT_SOURCE_FAILED, "QTPlayer loading failed")
@@ -565,7 +536,7 @@ class AIUIPlayerTest {
         verify(listener).onError(ErrorDef.ERROR_QT_SOURCE_FAILED, "QTPlayer loading failed")
 
         player.reset()
-        player.play(data, SERVICE_STORY)
+        player.play(data, serviceStory)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
         qtPlayerListener.onStateChange(MetaState.PLAYING)
@@ -580,7 +551,7 @@ class AIUIPlayerTest {
     fun error() {
         before(false)
 
-        player.play(data, SERVICE_STORY, false)
+        player.play(data, serviceStory, false)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
         qtPlayerListener.onError(ErrorDef.ERROR_QT_SOURCE_FAILED, "QTPlayer loading failed")
@@ -591,6 +562,6 @@ class AIUIPlayerTest {
     }
 
     private fun constructMetaInfo(source: JSONArray, index: Int): MetaItem {
-        return MetaItem(source.optJSONObject(index), SERVICE_STORY)
+        return MetaItem(source.optJSONObject(index), serviceStory)
     }
 }

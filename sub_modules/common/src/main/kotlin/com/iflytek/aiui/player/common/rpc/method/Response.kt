@@ -2,14 +2,9 @@ package com.iflytek.aiui.player.common.rpc.method
 
 import org.json.JSONObject
 
-class Response<T> {
-    private val id: Int
-    private val result: T
-
-    constructor(req_id: Int, value: T) {
-        id = req_id
-        result = value
-    }
+class Response<T>(req_id: Int, value: T) {
+    private val id: Int = req_id
+    private val result: T = value
 
     fun toJSONString(): String {
         val description = JSONObject()
