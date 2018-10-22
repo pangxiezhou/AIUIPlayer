@@ -128,6 +128,10 @@ data class MetaItem(val info: JSONObject, val service: String) {
             false
         }
     }
+
+    override fun hashCode(): Int {
+        return info.hashCode() + service.hashCode();
+    }
 }
 
 /**
@@ -240,7 +244,7 @@ class AIUIPlayer(context: Context) {
                     if (++mReadyCount == mPlayers.size) {
                         onStateChange(PlayState.READY)
                         runMain {
-                            mListeners.forEach { it.onPlayerReady() }
+                            mListeners.forEach {listener -> listener.onPlayerReady() }
                         }
                     }
                 }
@@ -263,13 +267,15 @@ class AIUIPlayer(context: Context) {
                             }
                         }
 
+                        else -> {}
+
                     }
                 }
 
                 override fun onRelease() {
                     if (--mReadyCount == 0) {
                         runMain {
-                            mListeners.forEach { it.onPlayerRelease() }
+                            mListeners.forEach {listener -> listener.onPlayerRelease() }
                         }
                         onStateChange(PlayState.IDLE)
                     }
@@ -353,6 +359,7 @@ class AIUIPlayer(context: Context) {
                 onStateChange(PlayState.PAUSED)
                 mActivePlayer?.pause()
             }
+            else -> {}
         }
     }
 
@@ -370,6 +377,8 @@ class AIUIPlayer(context: Context) {
                 mIndex++
                 playToNextAvailable(false)
             }
+
+            else -> {}
         }
     }
 

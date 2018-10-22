@@ -1,8 +1,7 @@
-package com.iflytek.aiui.player.common.rpc.storage
+package com.iflytek.aiui.player.common.storage
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.iflytek.aiui.player.common.storage.Storage
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever

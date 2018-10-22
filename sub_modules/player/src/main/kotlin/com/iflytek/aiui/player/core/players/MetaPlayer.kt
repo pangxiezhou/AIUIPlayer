@@ -94,7 +94,7 @@ abstract class MetaAbstractPlayer(protected val rpc: RPC) {
     /**
      * 播放单项内容
      */
-    abstract fun play(info: MetaItem)
+    abstract fun play(item: MetaItem)
 
     /**
      * 暂停播放
@@ -123,6 +123,8 @@ abstract class MetaAbstractPlayer(protected val rpc: RPC) {
             MetaState.IDLE -> {
                 mListeners.forEach { it.onRelease() }
             }
+
+            else -> {}
         }
         mListeners.forEach { it.onStateChange(mState) }
     }

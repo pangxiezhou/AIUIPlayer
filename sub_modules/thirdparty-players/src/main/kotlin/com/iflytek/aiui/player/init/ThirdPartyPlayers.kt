@@ -1,7 +1,6 @@
 package com.iflytek.aiui.player.init
 
 import android.content.Context
-import com.kugou.kgmusicsdk.KGMusicSDK
 
 class ThirdPartyPlayers {
     companion object {
