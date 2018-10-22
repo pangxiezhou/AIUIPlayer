@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Handler
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
+import com.iflytek.aiui.player.common.rpc.error.RPCError
 import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
@@ -545,21 +546,23 @@ class AIUIPlayerTest {
         player.play(data, SERVICE_STORY)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
-        qtPlayerListener.onStateChange(MetaState.ERROR)
+        qtPlayerListener.onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer loading failed")
 
         assertEquals(player.currentPlay, constructMetaInfo(data, 1))
         assertEquals(player.currentState, PlayState.LOADING)
 
         mediaPlayerListener.onStateChange(MetaState.LOADING)
-        mediaPlayerListener.onStateChange(MetaState.ERROR)
+        mediaPlayerListener.onError(RPCError.ERROR_RPC_TIMEOUT, "auth RPC Timeout")
 
         assertEquals(player.currentPlay, constructMetaInfo(data, 2))
         assertEquals(player.currentState, PlayState.LOADING)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
-        qtPlayerListener.onStateChange(MetaState.ERROR)
+        qtPlayerListener.onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer loading failed")
+
         assertEquals(player.currentPlay, constructMetaInfo(data, 2))
         assertEquals(player.currentState, PlayState.ERROR)
+        verify(listener).onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer loading failed")
 
         player.reset()
         player.play(data, SERVICE_STORY)
@@ -580,10 +583,11 @@ class AIUIPlayerTest {
         player.play(data, SERVICE_STORY, false)
 
         qtPlayerListener.onStateChange(MetaState.LOADING)
-        qtPlayerListener.onStateChange(MetaState.ERROR)
+        qtPlayerListener.onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer loading failed")
 
         assertEquals(player.currentPlay, constructMetaInfo(data, 0))
         assertEquals(player.currentState, PlayState.ERROR)
+        verify(listener).onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer loading failed")
     }
 
     private fun constructMetaInfo(source: JSONArray, index: Int): MetaItem {
