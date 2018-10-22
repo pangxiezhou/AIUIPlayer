@@ -4,8 +4,8 @@ import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCCallback
 import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
-import com.iflytek.aiui.player.common.rpc.storage.Storage
+import com.iflytek.aiui.player.common.error.ErrorDef
+import com.iflytek.aiui.player.common.storage.Storage
 import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
 import com.nhaarman.mockitokotlin2.*

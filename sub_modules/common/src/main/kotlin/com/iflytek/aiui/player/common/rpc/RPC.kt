@@ -2,7 +2,7 @@ package com.iflytek.aiui.player.common.rpc
 
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
+import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.method.Request
 import com.iflytek.aiui.player.common.rpc.method.Response
 import com.iflytek.aiui.player.common.rpc.method.Error

@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.iflytek.aiui.player.auth.sample"
+        applicationId "com.iflytek.aiui.player.remote.sample"
         minSdkVersion 14
         targetSdkVersion 27
         versionCode 1
