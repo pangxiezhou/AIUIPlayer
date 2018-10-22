@@ -74,11 +74,11 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
         })
     }
 
-    fun <T> request(request: Request, callback: RPCCallback<T>, timeout: Int = 30000) {
+    fun <T> request(request: Request, callback: RPCCallback<T>, timeout: Int = 10 * 60 * 1000) {
         request(request, callback, { _, _ -> }, timeout)
     }
 
-    fun <T> request(request: Request,  callback: RPCCallback<T>, error: RPCErrorCallback, timeout: Int = 30000) {
+    fun <T> request(request: Request,  callback: RPCCallback<T>, error: RPCErrorCallback, timeout: Int = 10 * 60 * 1000) {
         calls.add(RPCCall(timeout, request, callback, error) as RPCCall<Any>)
         send(request.toJSONString())
     }
