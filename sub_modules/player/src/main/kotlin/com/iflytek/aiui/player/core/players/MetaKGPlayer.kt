@@ -94,6 +94,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
                     }
                 }, { _, _ ->
                     mRPCRequesting = false
+                    stateChange(MetaState.ERROR)
                 })
             }
         }
