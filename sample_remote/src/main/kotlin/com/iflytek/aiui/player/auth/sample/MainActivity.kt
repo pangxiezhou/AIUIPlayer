@@ -10,6 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        PlayerRemote.init(this)
+        PlayerRemote.init(this, "192.168.1.114")
     }
 }

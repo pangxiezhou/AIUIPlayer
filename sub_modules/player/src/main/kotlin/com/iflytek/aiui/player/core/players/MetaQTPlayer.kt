@@ -44,7 +44,7 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
 
     override fun initialize() {
         super.initialize()
-        initializer?.invoke {
+        initializer.invoke {
             player = it
             player?.addListener(object : QTPlayer.StateChangeListener {
                 override fun onPlayDurationChange(duration: Int) {
