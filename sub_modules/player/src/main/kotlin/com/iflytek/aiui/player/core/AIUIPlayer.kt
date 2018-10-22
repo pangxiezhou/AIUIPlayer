@@ -311,7 +311,7 @@ class AIUIPlayer(context: Context) {
      * @return 列表是否播放成功
      *
      */
-    fun play(data: JSONArray, service: String, autoSkip: Boolean = true): Boolean {
+    fun play(data: JSONArray, service: String, autoSkipError: Boolean = true): Boolean {
         if (mState != PlayState.READY || !anyAvailablePlay(data, service)) return false
 
         mActivePlayer?.pause()
@@ -320,7 +320,7 @@ class AIUIPlayer(context: Context) {
             mData.add(MetaItem(data.optJSONObject(i), service))
         }
         mIndex = -1
-        mAutoSkipError = autoSkip
+        mAutoSkipError = autoSkipError
         return playToNextAvailable()
     }
 
