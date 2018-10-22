@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.common.rpc
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
-import com.iflytek.aiui.player.common.rpc.error.RPCError
+import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.method.SourceType
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.junit.After
@@ -203,7 +203,7 @@ class RPCTest {
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
 
         }, { error, _ ->
-            assertEquals(error, RPCError.ERROR_RPC_RESET)
+            assertEquals(error, ErrorDef.ERROR_RPC_RESET)
             countErrorAfterResetDown.countDown()
         })
 
@@ -219,7 +219,7 @@ class RPCTest {
 
         val countErrorAfterResetDown = CountDownLatch(1)
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { }, { error, _ ->
-            assertEquals(error, RPCError.ERROR_RPC_TIMEOUT)
+            assertEquals(error, ErrorDef.ERROR_RPC_TIMEOUT)
             countErrorAfterResetDown.countDown()
         }, 1000)
         countErrorAfterResetDown.await()

@@ -4,7 +4,7 @@ import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.RPCCallback
 import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
-import com.iflytek.aiui.player.common.rpc.error.RPCError
+import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.storage.Storage
 import com.iflytek.aiui.player.core.MetaItem
 import com.kugou.common.utils.KgInfo
@@ -158,10 +158,10 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        errorCallback?.invoke(RPCError.ERROR_RPC_RESET, "rpc peer reset")
+        errorCallback?.invoke(ErrorDef.ERROR_RPC_RESET, "rpc peer reset")
 
         verify(listener).onStateChange(MetaState.ERROR)
-        verify(listener).onError(RPCError.ERROR_RPC_RESET, "rpc peer reset")
+        verify(listener).onError(ErrorDef.ERROR_RPC_RESET, "rpc peer reset")
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
         verify(mRPC).request<String>(any(), any(), any(), any())
     }
@@ -266,7 +266,7 @@ class MetaKGPlayerTest {
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
 
         clearInvocations(mRPC, mKuGouAPI)
-        errorCallback?.invoke(RPCError.ERROR_RPC_RESET, "rpc peer reset")
+        errorCallback?.invoke(ErrorDef.ERROR_RPC_RESET, "rpc peer reset")
         player.play(MetaItem(JSONObject(hashMapOf(
                 "source" to "kugou",
                 "itemid" to "112358132134"
