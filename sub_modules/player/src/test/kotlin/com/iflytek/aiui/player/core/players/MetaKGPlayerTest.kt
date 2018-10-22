@@ -158,9 +158,10 @@ class MetaKGPlayerTest {
                 "itemid" to "112358132134"
         )), "story"))
 
-        errorCallback?.invoke(-1, "rpc peer reset")
+        errorCallback?.invoke(RPCError.ERROR_RPC_RESET, "rpc peer reset")
 
         verify(listener).onStateChange(MetaState.ERROR)
+        verify(listener).onError(RPCError.ERROR_RPC_RESET, "rpc peer reset")
         verify(mKuGouAPI, never()).login(fakeUserID, fakeToken)
         verify(mRPC).request<String>(any(), any(), any(), any())
     }
