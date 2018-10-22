@@ -18,7 +18,7 @@ abstract class ConnectionListener {
     /**
      * 连接数据回调
      */
-    open fun onData(data: String) {}
+    open fun onData(message: String) {}
 
     /**
      * 连接断开

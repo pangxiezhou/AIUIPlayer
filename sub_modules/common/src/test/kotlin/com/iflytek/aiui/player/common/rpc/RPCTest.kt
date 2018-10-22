@@ -161,13 +161,13 @@ class RPCTest {
 
     @Test(timeout = 2000)
     fun reset() {
-        var clientRPC = RPC(client, object: RPCListener {
+        val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
             }
         })
 
         val fakeResult = "fake_result"
-        var serverRPC = RPC(server, object: RPCListener {
+        val serverRPC = RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
                 clientRPC.reset()
                 rpc.response(TokenReq.createFromJSON(data), fakeResult)
@@ -187,7 +187,7 @@ class RPCTest {
 
     @Test(timeout = 2000)
     fun error() {
-        var clientRPC = RPC(client, object: RPCListener {
+        val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
             }
         })
@@ -212,7 +212,7 @@ class RPCTest {
 
     @Test(timeout = 2000)
     fun timeout() {
-        var clientRPC = RPC(client, object: RPCListener {
+        val clientRPC = RPC(client, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
             }
         })

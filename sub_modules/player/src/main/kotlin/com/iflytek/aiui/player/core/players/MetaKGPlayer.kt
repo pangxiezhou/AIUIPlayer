@@ -38,7 +38,7 @@ class KuGouAPI {
     }
 }
 
-class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
+class MetaKGPlayer(rpc: RPC, private val storage: Storage) : AbstractMediaPlayer(rpc) {
     private val tokenKey = "token"
     private val userIDKey = "userID"
     private var mKuGouAPI = KuGouAPI()
@@ -50,7 +50,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         mKuGouAPI.init()
     }
 
-    override fun retriveURL(item: MetaItem, callback: URLRetriveCallback) {
+    override fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback) {
         currentItem = item
         val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
         when (url.errorNo) {
@@ -71,12 +71,12 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
         }
     }
 
-    private fun onTokenExpire(item: MetaItem, callback: URLRetriveCallback) {
+    private fun onTokenExpire(item: MetaItem, callback: URLRetrieveCallback) {
         val savedToken = storage.getString(tokenKey)
         val savedUserID = storage.getInteger(userIDKey)
         //首先用本地缓存token进行登录
         if (!savedToken.isEmpty() && mKuGouAPI.login(savedUserID, savedToken)) {
-            retriveURL(item, callback)
+            retrieveURL(item, callback)
         } else {
             //当前正在请求中，不重复请求
             if (!mRPCRequesting) {
@@ -91,7 +91,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
                             storage.put(tokenKey, token)
                             storage.put(userIDKey, userID)
 
-                            retriveURL(currentItem!!, callback)
+                            retrieveURL(currentItem!!, callback)
                         }
                     }
                 }, { error, description ->
