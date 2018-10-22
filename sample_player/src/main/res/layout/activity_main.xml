@@ -1,92 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.iflytek.aiui.player.sample.MainActivity">
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/controlPage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/titleTxt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/controlPage"
-            android:orientation="vertical">
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:gravity="center"
+            android:text="@string/uninitialize_tip"
+            android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/titleTxt"
-                android:layout_width="match_parent"
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/grey"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/initializeBtn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:text="@string/uninitialize_tip"
-                android:inputType="textPersonName" />
+                android:layout_weight="1"
+                android:text="@string/initialize_tip" />
 
-            <LinearLayout
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/grey"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp">
+            <Button
+                android:id="@+id/releaseBtn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/release_tip" />
 
-                <Button
-                    android:id="@+id/initializeBtn"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/initialize_tip" />
-
-                <Button
-                    android:id="@+id/releaseBtn"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/release_tip" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/grey"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/PreBtn"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/preTip" />
-
-                <Button
-                    android:id="@+id/ToggleBtn"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/pauseTip" />
-
-                <Button
-                    android:id="@+id/NextBtn"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/nextTip" />
-            </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/grey"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/PreBtn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/preTip" />
+
+            <Button
+                android:id="@+id/ToggleBtn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pauseTip" />
+
+            <Button
+                android:id="@+id/NextBtn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/nextTip" />
+        </LinearLayout>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

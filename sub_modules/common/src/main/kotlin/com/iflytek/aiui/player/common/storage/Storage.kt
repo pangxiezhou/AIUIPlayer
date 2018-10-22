@@ -6,11 +6,17 @@ class Storage(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("player_storage", Context.MODE_PRIVATE)
 
     fun put(key: String, value: String) {
-        sharedPreferences.edit().putString(key, value).commit()
+        with(sharedPreferences.edit()){
+            putString(key, value)
+            apply()
+        }
     }
 
     fun put(key: String, value: Int) {
-        sharedPreferences.edit().putInt(key, value).commit()
+        with(sharedPreferences.edit()){
+            putInt(key, value)
+            apply()
+        }
     }
 
     fun getString(key: String): String {

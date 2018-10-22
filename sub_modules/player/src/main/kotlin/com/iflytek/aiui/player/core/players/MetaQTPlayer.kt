@@ -73,6 +73,10 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
                         QTPlayer.PlayState.SOURCEFAIL -> {
                             onError(ErrorDef.ERROR_QT_SOURCE_FAILED, "QTPlayer Loading failed")
                         }
+
+                        else -> {
+
+                        }
                     }
                 }
             })
@@ -82,8 +86,8 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
     }
 
 
-    override fun play(info: MetaItem) {
-        val data = info.info
+    override fun play(item: MetaItem) {
+        val data = item.info
         //通过resourceId字段拆分出channelID和ProgramID
         //完整广播节目只包含ChannelID
         val resourceId = data.optString("resourceId")

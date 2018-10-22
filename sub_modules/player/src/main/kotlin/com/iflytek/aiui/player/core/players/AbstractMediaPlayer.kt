@@ -22,7 +22,7 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         super.initialize()
         mInitializer.invoke {
             mMediaPlayer = it
-            mMediaPlayer.setOnCompletionListener {
+            mMediaPlayer.setOnCompletionListener { _ ->
                 stateChange(MetaState.COMPLETE)
             }
 
@@ -34,7 +34,7 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
                true
             }
 
-            mMediaPlayer.setOnPreparedListener {
+            mMediaPlayer.setOnPreparedListener {_ ->
                 // 仅在处于播放状态时，缓冲后立即播放
                 if(state() == MetaState.LOADING) {
                     stateChange(MetaState.PLAYING)

@@ -27,7 +27,7 @@ object PlayerRemote {
     fun init(context: Context, connection: WebSocketClientConnection) {
         stopOnDestroy = false
         this.connection = connection
-        rpc = RPC(connection!!, object : RPCListener {
+        rpc = RPC(connection, object : RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
                 val req = JSONObject(data)
                 when (req.optString("method")) {
