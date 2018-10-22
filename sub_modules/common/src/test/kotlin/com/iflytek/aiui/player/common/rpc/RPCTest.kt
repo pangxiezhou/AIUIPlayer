@@ -101,6 +101,7 @@ class RPCTest {
             }
         })
 
+        //重启RPCServer服务
         server.stop()
         val countClientDeactivateDown = CountDownLatch(1)
         client.registerConnectionListener(object : ConnectionListener() {
@@ -111,7 +112,7 @@ class RPCTest {
         countClientDeactivateDown.await()
         server.start()
 
-        //after server restart
+        //RPC服务重启后，自动重连
         val countClientTokenRecvDown = CountDownLatch(1)
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { token ->
             assertEquals(token, fakeServerToken)
@@ -167,7 +168,7 @@ class RPCTest {
         })
 
         val fakeResult = "fake_result"
-        val serverRPC = RPC(server, object: RPCListener {
+         RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
                 clientRPC.reset()
                 rpc.response(TokenReq.createFromJSON(data), fakeResult)
@@ -178,11 +179,11 @@ class RPCTest {
         //client rpc request never success after reset
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
             clientRecvDown.countDown()
+        }, {error, _ ->
+            assertEquals(error, ErrorDef.ERROR_RPC_RESET)
         })
 
         assertFalse(clientRecvDown.await(1, TimeUnit.SECONDS))
-        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {})
-//        verify(server, never()).send(any())
     }
 
     @Test(timeout = 2000)
@@ -194,7 +195,6 @@ class RPCTest {
 
         RPC(server, object: RPCListener {
             override fun onRequest(rpc: RPC, data: String) {
-                //server rpc reset
                 rpc.reset()
             }
         })
