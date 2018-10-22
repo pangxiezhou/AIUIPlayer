@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+ext.sdk_version = 1001
+
 buildscript {
     ext.kotlin_version = '1.2.71'
     repositories {
@@ -33,4 +35,50 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+task cleanAll(dependsOn: [clean, ':sample_player:clean', ':sample_remote:clean'])
+
+
+task buildAll(dependsOn: [':sample_player:assembleDebug', ':sample_remote:assembleDebug']) {
+    doLast {
+        //准备源码
+        copy {
+            from  project.projectDir
+            into "build/$sdk_version/src/AIUIPlayer/"
+
+            // 忽略签名文件
+            exclude 'iflytekSigneKey'
+            exclude 'local.properties'
+            exclude 'gradle.properties'
+            // 忽略gradle生成目录
+            exclude '**/*.apk', '**/*.ap_', '**/*.dex', '**/*.class'
+            exclude '**/bin/', '**/gen/', '**/out/', '**/build/', '**/proguard/'
+            exclude '**/*.iml', '**/.gradle/', '**/.idea/', '**/.externalNativeBuild/', '**/.navigation/'
+        }
+
+        //remote apk
+        copy {
+            from new File(project(':sample_remote').buildDir, "outputs/apk/debug")
+            into "build/$sdk_version/bin/"
+
+            include '*.apk'
+        }
+
+        //player apk
+        copy {
+            from new File(project(':sample_player').buildDir, "outputs/apk/debug")
+            into "build/$sdk_version/bin/"
+
+            include '*.apk'
+        }
+
+        //doc
+        copy {
+            from project.projectDir
+            into "build/$sdk_version/doc/"
+
+            include 'pictures/**', 'README.md'
+        }
+    }
 }

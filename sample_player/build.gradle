@@ -38,6 +38,11 @@ android {
         test.java.srcDirs += 'test/main/kotlin'
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "sample_player-${variant.buildType.name}-${sdk_version}.apk"
+        }
+    }
 }
 
 dependencies {
@@ -50,5 +55,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':player')
-//    implementation 'com.github.pangxiezhou.AIUIPlayer:player:0.3'
+//    implementation "com.github.pangxiezhou.AIUIPlayer:player:$sdk_version"
 }
