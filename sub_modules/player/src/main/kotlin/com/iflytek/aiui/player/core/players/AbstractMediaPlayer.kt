@@ -8,7 +8,7 @@ import com.iflytek.aiui.player.core.MetaItem
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
 typealias MediaPlayerInitializer = (MediaPlayerCallBack) -> Unit
 
-typealias URLRetriveCallback = (String) -> Unit
+typealias URLRetrieveCallback = (String) -> Unit
 
 abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
     private lateinit var mMediaPlayer:MediaPlayer
@@ -43,7 +43,7 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         mMediaPlayer.apply {
             stateChange(MetaState.LOADING)
             setAudioStreamType(AudioManager.STREAM_MUSIC)
-            retriveURL(item) {
+            retrieveURL(item) {
                 setDataSource(it)
                 prepareAsync()
             }
@@ -74,5 +74,5 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         super.release()
     }
 
-    abstract fun retriveURL(item: MetaItem, callback: URLRetriveCallback)
+    abstract fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback)
 }

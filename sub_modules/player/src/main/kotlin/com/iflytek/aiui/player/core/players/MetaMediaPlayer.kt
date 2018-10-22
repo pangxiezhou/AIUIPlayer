@@ -5,7 +5,7 @@ import com.iflytek.aiui.player.core.MetaItem
 
 
 class MetaMediaPlayer(rpc: RPC): AbstractMediaPlayer(rpc) {
-    override fun retriveURL(item: MetaItem, callback: URLRetriveCallback) {
+    override fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback) {
         callback(item.url)
     }
 

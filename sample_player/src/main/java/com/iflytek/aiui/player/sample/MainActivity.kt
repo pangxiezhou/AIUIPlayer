@@ -123,8 +123,13 @@ class MainActivity : AppCompatActivity() {
                         "songname" to "尽头",
                         "singernames" to listOf("赵方婧"),
                         "itemid" to "73f211b375593a4332bb5e4a28602c61"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "kugou",
+                        "songname" to "广东爱情故事",
+                        "singernames" to listOf("广东雨神"),
+                        "itemid" to "2a25aaff4b6c84b859b4d77f944de57a"
                 ))
-
         )
         ), "musicX")
     }
