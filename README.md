@@ -115,7 +115,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player:0.3'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1001'
 }
 ```
 
@@ -124,7 +124,7 @@ dependencies {
 ```groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:0.3'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1001'
 }
 ```
 
@@ -169,10 +169,16 @@ dependencies {
     }
 
     PreBtn.setOnClickListener {
-            if (player.previous()) {
-                Toast.makeText(this, "当前已是第一首", Toast.LENGTH_LONG).show()
-            }
+        if (player.previous()) {
+            Toast.makeText(this, "当前已是第一首", Toast.LENGTH_LONG).show()
         }
+    }
+
+    NextBtn.setOnClickListener {
+        if (!player.next()) {
+            Toast.makeText(this, "当前已是最后一首", Toast.LENGTH_LONG).show()
+        }
+    }
 ```
 
 更详细的调用参考sample_player目录下代码示例。
@@ -185,6 +191,7 @@ dependencies {
     PlayerRemote.init(context)
 ```
 
+更详细的调用参考sample_remote目录下代码示例。
 
 
 ## 4. Player状态参考
