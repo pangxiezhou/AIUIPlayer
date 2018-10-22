@@ -2,8 +2,8 @@ package com.iflytek.aiui.player.core.players
 
 import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.RPCCallback
-import com.iflytek.aiui.player.common.rpc.RPCErrorCallback
+import com.iflytek.aiui.player.common.rpc.SuccessCallback
+import com.iflytek.aiui.player.common.rpc.ErrorCallback
 import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.common.storage.Storage
 import com.iflytek.aiui.player.core.MetaItem
@@ -84,7 +84,7 @@ class MetaKGPlayerTest {
         setUpStorageMock()
 
         whenever(mRPC.request<String>(any(), any(), any(), any())).then {
-            (it.arguments[1] as RPCCallback<String>)("$fakeUserID#$fakeToken")
+            (it.arguments[1] as SuccessCallback<String>)("$fakeUserID#$fakeToken")
         }
 
 
@@ -146,10 +146,10 @@ class MetaKGPlayerTest {
         val listener = mock<MetaListener>()
         player.addListener(listener)
 
-        var errorCallback: RPCErrorCallback? = null
+        var errorCallback: ErrorCallback? = null
         whenever(mRPC.request<String>(any(), any(), any(), any())).then { it ->
             //只存储，不立即回调
-            errorCallback = it.arguments[2] as RPCErrorCallback
+            errorCallback = it.arguments[2] as ErrorCallback
             true
         }
 
@@ -238,10 +238,10 @@ class MetaKGPlayerTest {
     fun onlyOneActiveRequest() {
         setUp()
 
-        var errorCallback: RPCErrorCallback? = null
+        var errorCallback: ErrorCallback? = null
         whenever(mRPC.request<String>(any(), any(), any(), any())).then { it ->
             //只存储，不立即回调
-            errorCallback = it.arguments[2] as RPCErrorCallback
+            errorCallback = it.arguments[2] as ErrorCallback
             true
         }
 
@@ -277,10 +277,10 @@ class MetaKGPlayerTest {
     fun tokenOnCurrent() {
         setUp()
 
-        var callback: RPCCallback<String>? = null
+        var callback: SuccessCallback<String>? = null
         whenever(mRPC.request<String>(any(), any(), any(), any())).then { it ->
             //只存储，不立即回调
-            callback = it.arguments[1] as RPCCallback<String>
+            callback = it.arguments[1] as SuccessCallback<String>
             true
         }
 
