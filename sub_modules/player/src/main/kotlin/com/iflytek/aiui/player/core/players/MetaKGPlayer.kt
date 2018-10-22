@@ -43,6 +43,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
     private val userIDKey = "userID"
     private var mKuGouAPI = KuGouAPI()
     private var mRPCRequesting = false
+    private var currentItem: MetaItem? = null
 
     override fun initialize() {
         super.initialize()
@@ -50,6 +51,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
     }
 
     override fun retriveURL(item: MetaItem, callback: URLRetriveCallback) {
+        currentItem = item
         val url = mKuGouAPI.retrieveUrl(item.info.optString("itemid"), 0)
         when (url.errorNo) {
             0 -> {
@@ -89,7 +91,7 @@ class MetaKGPlayer(rpc: RPC, val storage: Storage) : AbstractMediaPlayer(rpc) {
                             storage.put(tokenKey, token)
                             storage.put(userIDKey, userID)
 
-                            retriveURL(item, callback)
+                            retriveURL(currentItem!!, callback)
                         }
                     }
                 }, { error, description ->
