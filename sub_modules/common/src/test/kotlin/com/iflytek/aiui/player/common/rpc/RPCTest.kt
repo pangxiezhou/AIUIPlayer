@@ -175,7 +175,7 @@ class RPCTest {
         })
 
         val clientRecvDown = CountDownLatch(1)
-        //client rpc request never callback after reset
+        //client rpc request never success after reset
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
             clientRecvDown.countDown()
         })
