@@ -22,6 +22,5 @@ class ErrorTest {
         val error = jsonResp.optJSONObject("error")
         assertEquals(error.optInt("code"), code)
         assertEquals(error.optString("message"), message)
-
     }
 }

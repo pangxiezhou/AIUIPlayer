@@ -9,7 +9,7 @@ import org.junit.Assert.*
 class MetaItemTest {
 
     @Test
-    fun getTitle() {
+    fun parse() {
         val songName = "演员"
         val songPath = "http://vbox.hf.openstorage.cn/ctimusic/128/2015-06-12/%E8%96%9B%E4%B9%8B%E8%B0%A6/%E7%BB%85%E5%A3%AB/%E6%BC%94%E5%91%98.mp3"
         val singer = "薛之谦"
