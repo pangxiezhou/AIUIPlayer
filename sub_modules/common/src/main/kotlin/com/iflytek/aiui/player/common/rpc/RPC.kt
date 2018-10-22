@@ -10,20 +10,20 @@ import org.json.JSONObject
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 
-typealias RPCCallback<T> = (T) -> Unit
-typealias RPCErrorCallback = (Int, String) -> Unit
+typealias SuccessCallback<T> = (T) -> Unit
+typealias ErrorCallback = (Int, String) -> Unit
 
 interface RPCListener {
     fun onRequest(rpc: RPC, data: String)
 }
 
-data class RPCCall<T>(var timeout: Int, val request: Request, val callback: RPCCallback<T>, val errorCallback: RPCErrorCallback?)
+data class Call<T: Any>(var timeout: Int, val request: Request, val success: SuccessCallback<T>, val error: ErrorCallback?)
 
 /**
  * JSONRPC 远程调用接口
  */
 class RPC(private val dataConnection: DataConnection, private val rpcListener: RPCListener) {
-    private val calls = mutableListOf<RPCCall<Any>>()
+    private val calls = mutableListOf<Call<Any>>()
     private val sendQueue = mutableListOf<String>()
     private val pendingRequest = mutableListOf<Int>()
 
@@ -32,7 +32,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             calls.removeAll {
                 it.timeout -= 100
                 if(it.timeout < 0) {
-                    it.errorCallback?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc timeout")
+                    it.error?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc timeout")
                     true
                 } else {
                     false
@@ -54,12 +54,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
                         val error = data.optJSONObject("error")
                         calls.find {
                             it.request.id == data.optInt("id")
-                        }?.errorCallback?.invoke(error.optInt("code"), error.optString("message"))
+                        }?.error?.invoke(error.optInt("code"), error.optString("message"))
                     }
                     data.has("result") -> {
                         calls.find {
                             it.request.id == data.optInt("id")
-                        }?.callback?.invoke(data.opt("result"))
+                        }?.success?.invoke(data.opt("result"))
                     }
                     else -> {
                         val req = JSONObject(message)
@@ -74,12 +74,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
         })
     }
 
-    fun <T> request(request: Request, callback: RPCCallback<T>, timeout: Int = 10 * 60 * 1000) {
+    fun <T: Any> request(request: Request, callback: SuccessCallback<T>, timeout: Int = 10 * 60 * 1000) {
         request(request, callback, { _, _ -> }, timeout)
     }
 
-    fun <T> request(request: Request,  callback: RPCCallback<T>, error: RPCErrorCallback, timeout: Int = 10 * 60 * 1000) {
-        calls.add(RPCCall(timeout, request, callback, error) as RPCCall<Any>)
+    fun <T: Any> request(request: Request, callback: SuccessCallback<T>, error: ErrorCallback, timeout: Int = 10 * 60 * 1000) {
+        calls.add(Call(timeout, request, callback, error) as Call<Any>)
         send(request.toJSONString())
     }
 
@@ -98,7 +98,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     fun reset() {
         sendQueue.clear()
         calls.removeAll {
-            it.errorCallback?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc reset")
+            it.error?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc reset")
             true
         }
 
