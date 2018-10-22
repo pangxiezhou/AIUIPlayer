@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.common.rpc
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketClientConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
+import com.iflytek.aiui.player.common.rpc.error.RPCError
 import com.iflytek.aiui.player.common.rpc.method.SourceType
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import org.junit.After
@@ -67,16 +68,16 @@ class RPCTest {
         })
 
         val countServerTokenRecvDown = CountDownLatch(1)
-        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
+        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { token ->
             assertEquals(token, fakeClientToken)
             countServerTokenRecvDown.countDown()
-        }
+        })
 
         val countClientTokenRecvDown = CountDownLatch(1)
-        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { token ->
             assertEquals(token, fakeServerToken)
             countClientTokenRecvDown.countDown()
-        }
+        })
 
         countServerTokenRecvDown.await()
         countClientTokenRecvDown.await()
@@ -112,10 +113,10 @@ class RPCTest {
 
         //after server restart
         val countClientTokenRecvDown = CountDownLatch(1)
-        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { token ->
             assertEquals(token, fakeServerToken)
             countClientTokenRecvDown.countDown()
-        }
+        })
 
         countClientTokenRecvDown.await()
     }
@@ -150,10 +151,10 @@ class RPCTest {
 
         //after client restart
         val countServerTokenRecvDown = CountDownLatch(1)
-        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) { token ->
+        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { token ->
             assertEquals(token, fakeClientToken)
             countServerTokenRecvDown.countDown()
-        }
+        })
 
         countServerTokenRecvDown.await()
     }
@@ -175,12 +176,12 @@ class RPCTest {
 
         val clientRecvDown = CountDownLatch(1)
         //client rpc request never callback after reset
-        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) {
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
             clientRecvDown.countDown()
-        }
+        })
 
         assertFalse(clientRecvDown.await(1, TimeUnit.SECONDS))
-        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing)) {}
+        serverRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {})
 //        verify(server, never()).send(any())
     }
 
@@ -202,10 +203,25 @@ class RPCTest {
         clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), {
 
         }, { error, _ ->
-            assertEquals(error, -1)
+            assertEquals(error, RPCError.ERROR_RPC_RESET)
             countErrorAfterResetDown.countDown()
         })
 
+        countErrorAfterResetDown.await()
+    }
+
+    @Test(timeout = 2000)
+    fun timeout() {
+        var clientRPC = RPC(client, object: RPCListener {
+            override fun onRequest(rpc: RPC, data: String) {
+            }
+        })
+
+        val countErrorAfterResetDown = CountDownLatch(1)
+        clientRPC.request<String>(TokenReq.createFor(SourceType.QingTing), { }, { error, _ ->
+            assertEquals(error, RPCError.ERROR_RPC_TIMEOUT)
+            countErrorAfterResetDown.countDown()
+        }, 1000)
         countErrorAfterResetDown.await()
     }
 }
