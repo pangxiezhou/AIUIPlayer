@@ -39,7 +39,7 @@ class TokenReqTest {
         assertEquals(serializeData.getString("jsonrpc"), "2.0")
         assertNotNull(serializeData.getInt("id"))
         assertEquals(serializeData.getString("method"), "getAuth")
-        assertEquals(serializeData.getJSONObject("params").getString("source"), "qingting")
+        assertEquals(serializeData.getJSONObject("params").getString("source"), "QingTing")
     }
 
     @Test
