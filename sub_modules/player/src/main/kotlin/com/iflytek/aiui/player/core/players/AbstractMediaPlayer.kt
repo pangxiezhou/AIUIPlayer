@@ -3,6 +3,7 @@ package com.iflytek.aiui.player.core.players
 import android.media.AudioManager
 import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
+import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.core.MetaItem
 
 typealias MediaPlayerCallBack = (MediaPlayer) -> Unit
@@ -24,7 +25,12 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
                 stateChange(MetaState.COMPLETE)
             }
 
-            mMediaPlayer.setOnErrorListener { _, _, _ -> true }
+            mMediaPlayer.setOnErrorListener { _, _, error ->
+                if(error != 0) {
+                    onError(ErrorDef.ERROR_MEDIA_PLAYER_ERROR, "Media Player Error $error")
+                }
+               true
+            }
 
             mMediaPlayer.setOnPreparedListener {
                 // 仅在处于播放状态时，缓冲后立即播放
@@ -52,7 +58,9 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
 
     override fun pause() {
         try {
-            mMediaPlayer.pause()
+            if(mMediaPlayer.isPlaying) {
+                mMediaPlayer.pause()
+            }
         } catch (e: Exception) {
             //ignore IllegalStateException
         }
