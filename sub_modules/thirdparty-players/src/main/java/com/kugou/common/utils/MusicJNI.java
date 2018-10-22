@@ -11,14 +11,12 @@ public class MusicJNI
 
     static public int KgHwsdkLogin(String inputToken, Object info, int userId) {
         Log.i(TAG, "===========KgHwsdkLogin==" + inputToken);
-        int ret = kg_hw_sdk_login(inputToken, info, userId);
-        return ret;
+        return kg_hw_sdk_login(inputToken, info, userId);
     }
 
     static public int KgNativeInit() {
         Log.i(TAG, "===========setUnInit");
-        int ret = kg_native_init();
-        return  ret;
+        return kg_native_init();
     }
 
 
