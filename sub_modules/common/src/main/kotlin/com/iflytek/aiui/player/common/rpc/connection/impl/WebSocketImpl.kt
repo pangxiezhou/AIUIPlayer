@@ -6,6 +6,7 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.handshake.ServerHandshake
 import org.java_websocket.server.WebSocketServer
+import timber.log.Timber
 import java.net.InetSocketAddress
 import java.net.URI
 import java.util.*
@@ -22,14 +23,14 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
     private var serverInitializer: ServerInitializer = { port ->
         object : WebSocketServer(InetSocketAddress(port)) {
             override fun onOpen(conn: WebSocket?, handshake: ClientHandshake?) {
-                println("server on client connected")
+                Timber.d("webSocket server on client connected")
                 if (connections.size == 1) {
                     onActive()
                 }
             }
 
             override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
-                println("server on client disconnected")
+                Timber.d("webSocket server on client disconnected")
                 if (connections.isEmpty()) {
                     onDeactivate()
                 }
@@ -40,12 +41,11 @@ class WebSocketServerConnection(private val port: Int) : DataConnection() {
             }
 
             override fun onStart() {
-                println("server on Start")
                 this@WebSocketServerConnection.onStart()
             }
 
             override fun onError(conn: WebSocket?, ex: Exception?) {
-                println("server on error $ex")
+                Timber.e("webSocket server on error $ex")
             }
         }
     }
