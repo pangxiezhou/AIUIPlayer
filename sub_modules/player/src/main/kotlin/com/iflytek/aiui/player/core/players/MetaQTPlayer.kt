@@ -5,7 +5,7 @@ import fm.qingting.qtsdk.play.QTPlay
 import fm.qingting.qtsdk.player.QTPlayer
 import android.content.Context
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.error.RPCError
+import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.core.MetaItem
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 import fm.qingting.qtsdk.callbacks.QTCallback
@@ -71,7 +71,7 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
 
                         //播放源错误
                         QTPlayer.PlayState.SOURCEFAIL -> {
-                            onError(RPCError.ERROR_QT_SOURCEFAILED, "QTPlayer Loading failed")
+                            onError(ErrorDef.ERROR_QT_SOURCE_FAILED, "QTPlayer Loading failed")
                         }
                     }
                 }

@@ -2,10 +2,10 @@ package com.iflytek.aiui.player.common.rpc
 
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
-import com.iflytek.aiui.player.common.rpc.error.RPCError
-import com.iflytek.aiui.player.common.rpc.method.Error
+import com.iflytek.aiui.player.common.rpc.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.method.Request
 import com.iflytek.aiui.player.common.rpc.method.Response
+import com.iflytek.aiui.player.common.rpc.method.Error
 import org.json.JSONObject
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
@@ -32,7 +32,7 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
             calls.removeAll {
                 it.timeout -= 100
                 if(it.timeout < 0) {
-                    it.errorCallback?.invoke(RPCError.ERROR_RPC_TIMEOUT, "rpc timeout")
+                    it.errorCallback?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc timeout")
                     true
                 } else {
                     false
@@ -98,12 +98,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     fun reset() {
         sendQueue.clear()
         calls.removeAll {
-            it.errorCallback?.invoke(RPCError.ERROR_RPC_TIMEOUT, "rpc reset")
+            it.errorCallback?.invoke(ErrorDef.ERROR_RPC_TIMEOUT, "rpc reset")
             true
         }
 
         pendingRequest.removeAll {
-            send(Error(it, RPCError.ERROR_RPC_RESET, "rpc peer reset").toJSONString())
+            send(Error(it, ErrorDef.ERROR_RPC_RESET, "rpc peer reset").toJSONString())
             true
         }
     }
