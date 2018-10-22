@@ -51,6 +51,11 @@ interface MetaListener {
     fun onStateChange(state: MetaState)
 
     /**
+     * 错误回调
+     */
+    fun onError(error: Int, description: String)
+
+    /**
      * 销毁
      */
     fun onRelease()
@@ -120,6 +125,11 @@ abstract class MetaAbstractPlayer(protected val rpc: RPC) {
             }
         }
         mListeners.forEach { it.onStateChange(mState) }
+    }
+
+    protected fun onError(error: Int, description: String) {
+        stateChange(MetaState.ERROR)
+        mListeners.forEach { it.onError(error, description) }
     }
 
     protected fun state(): MetaState {
