@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.os.Handler
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
-import com.iflytek.aiui.player.common.rpc.storage.Storage
+import com.iflytek.aiui.player.common.error.ErrorDef
+import com.iflytek.aiui.player.common.storage.Storage
 import com.iflytek.aiui.player.core.players.*
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray

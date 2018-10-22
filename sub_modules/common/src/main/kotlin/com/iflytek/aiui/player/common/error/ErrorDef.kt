@@ -1,4 +1,4 @@
-package com.iflytek.aiui.player.common.rpc.error
+package com.iflytek.aiui.player.common.error
 
 object ErrorDef {
     const val ERROR_RPC_TIMEOUT = 1001

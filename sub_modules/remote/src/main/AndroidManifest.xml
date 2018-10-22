@@ -7,7 +7,7 @@
 
     <application>
         <activity
-            android:name="com.iflytek.aiui.player.auth.login.KuGouLoginActivity"
+            android:name="com.iflytek.aiui.player.remote.login.KuGouLoginActivity"
             android:label="@string/title_activity_ku_gou_login"
             android:theme="@style/AuthAppTheme"></activity>
     </application>

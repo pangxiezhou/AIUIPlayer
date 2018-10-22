@@ -1,4 +1,4 @@
-package com.iflytek.aiui.player.auth.login
+package com.iflytek.aiui.player.remote.login
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -15,7 +15,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
-import com.iflytek.aiui.player.auth.PlayerRemote
+import com.iflytek.aiui.player.remote.PlayerRemote
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
 import com.iflytek.aiui.player.init.ThirdPartyPlayers
 
@@ -348,7 +348,7 @@ class KuGouLoginActivity : AppCompatActivity() {
              * 电信号段: 133,149,153,170,173,177,180,181,189
              */
             // "[1]"代表下一位为数字可以是几，"[0-9]"代表可以为0-9中的一个，"[5,7,9]"表示可以是5,7,9中的任意一位,[^4]表示除4以外的任何一个,\\d{9}"代表后面是可以是0～9的数字，有9位。
-            val telRegex = Regex("^((13[0-9])|(14[5,7,9])|(15[^4])|(18[0-9])|(17[0,1,3,5,6,7,8]))\\d{8}$")
+            val telRegex = Regex("^((13[0-9])|(14[579])|(15[^4])|(18[0-9])|(17[0135678]))\\d{8}$")
             return if (TextUtils.isEmpty(phoneNumber))
                 false
             else

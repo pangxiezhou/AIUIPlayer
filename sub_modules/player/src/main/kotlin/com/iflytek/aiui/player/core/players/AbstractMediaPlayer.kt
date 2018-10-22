@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.core.players
 import android.media.AudioManager
 import android.media.MediaPlayer
 import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.error.ErrorDef
+import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.core.MetaItem
 import timber.log.Timber
 

@@ -1,8 +1,8 @@
-package com.iflytek.aiui.player.auth.sample
+package com.iflytek.aiui.player.remote.sample
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.iflytek.aiui.player.auth.PlayerRemote
+import com.iflytek.aiui.player.remote.PlayerRemote
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,6 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        PlayerRemote.init(this, "192.168.1.114")
+        PlayerRemote.init(this)
     }
 }
