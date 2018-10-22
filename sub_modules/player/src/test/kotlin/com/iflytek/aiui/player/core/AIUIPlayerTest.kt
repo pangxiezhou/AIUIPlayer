@@ -2,6 +2,7 @@ package com.iflytek.aiui.player.core
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Handler
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.common.rpc.storage.Storage
@@ -32,6 +33,9 @@ class AIUIPlayerTest {
 
     @Spy
     private val mPlayers: List<MetaAbstractPlayer> = listOf(qtPlayer, mediaPlayer)
+
+    @Mock
+    private lateinit var mainHandler: Handler
 
     @Mock
     private lateinit var listener: PlayerListener
@@ -66,6 +70,10 @@ class AIUIPlayerTest {
             mock<SharedPreferences>()
         }
 
+        whenever(mainHandler.post(any())).then {
+            (it.arguments[0] as Runnable).run()
+            null
+        }
     }
 
     private fun allPlayerReady() {
