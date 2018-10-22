@@ -2,10 +2,13 @@ package com.iflytek.aiui.player.common.rpc
 
 import com.iflytek.aiui.player.common.rpc.connection.ConnectionListener
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
+import com.iflytek.aiui.player.common.rpc.error.RPCError
 import com.iflytek.aiui.player.common.rpc.method.Error
 import com.iflytek.aiui.player.common.rpc.method.Request
 import com.iflytek.aiui.player.common.rpc.method.Response
 import org.json.JSONObject
+import java.util.*
+import kotlin.concurrent.scheduleAtFixedRate
 
 typealias RPCCallback<T> = (T) -> Unit
 typealias RPCErrorCallback = (Int, String) -> Unit
@@ -14,7 +17,7 @@ interface RPCListener {
     fun onRequest(rpc: RPC, data: String)
 }
 
-data class RPCCall<T>(val request: Request, val callback: RPCCallback<T>, val errorCallback: RPCErrorCallback?)
+data class RPCCall<T>(var timeout: Int, val request: Request, val callback: RPCCallback<T>, val errorCallback: RPCErrorCallback?)
 
 /**
  * JSONRPC 远程调用接口
@@ -25,6 +28,18 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     private val pendingRequest = mutableListOf<Int>()
 
     init {
+        Timer().scheduleAtFixedRate(0, 100) {
+            calls.removeAll {
+                it.timeout -= 100
+                if(it.timeout < 0) {
+                    it.errorCallback?.invoke(RPCError.ERROR_RPC_TIMEOUT, "rpc timeout")
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+
         dataConnection.registerConnectionListener(object : ConnectionListener() {
             override fun onActive() {
                 sendQueue.removeAll {
@@ -59,12 +74,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
         })
     }
 
-    fun <T> request(request: Request, callback: RPCCallback<T>) {
-        request(request, callback, null)
+    fun <T> request(request: Request, callback: RPCCallback<T>, timeout: Int = 30000) {
+        request(request, callback, { _, _ -> }, timeout)
     }
 
-    fun <T> request(request: Request, callback: RPCCallback<T>, error: RPCErrorCallback? = null) {
-        calls.add(RPCCall(request, callback, error) as RPCCall<Any>)
+    fun <T> request(request: Request,  callback: RPCCallback<T>, error: RPCErrorCallback, timeout: Int = 30000) {
+        calls.add(RPCCall(timeout, request, callback, error) as RPCCall<Any>)
         send(request.toJSONString())
     }
 
@@ -83,12 +98,12 @@ class RPC(private val dataConnection: DataConnection, private val rpcListener: R
     fun reset() {
         sendQueue.clear()
         calls.removeAll {
-            it.errorCallback?.invoke(-1, "rpc reset")
+            it.errorCallback?.invoke(RPCError.ERROR_RPC_TIMEOUT, "rpc reset")
             true
         }
 
         pendingRequest.removeAll {
-            send(Error(it, -1, "rpc peer reset").toJSONString())
+            send(Error(it, RPCError.ERROR_RPC_RESET, "rpc peer reset").toJSONString())
             true
         }
     }
