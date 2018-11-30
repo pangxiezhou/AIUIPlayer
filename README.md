@@ -41,6 +41,7 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 
 目前播放支持：
 
+- 咪咕音乐
 - 蜻蜓FM
 - 酷狗音乐
 - 直接URL资源
@@ -49,21 +50,18 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 
 ### 2.1 模块介绍
 
-.
 
-+---- sample_player   // 播放器集成调用示例
 
-+---- sample_remote  // 控制器集成调用示例
-
-+---- sub_modules
-
-​      +---- common   // 公共依赖
-
-​      +---- player       // 播放器library
-
-​      +---- remote     //控制器library
-
-​      +---- thirdparty-players // 第三方SDK播放器依赖
+    -  sample_player   // 播放器集成调用示例
+    -  sample_remote  // 控制器集成调用示例
+    -  sub_modules
+          -  common      // 公共依赖
+          -  player          // 播放器library
+          - remote         //控制器library
+    - sub_players
+           - migu           // 咪咕播放器实现
+          - kugou          // 酷狗播放器实现
+          - qingting       // 蜻蜓播放器实现
 
 
 
@@ -80,7 +78,6 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 播放器模块和控制器模块可以集成在一个App内，该App既负责音频播放也负责授权处理，比较适用于手机App或者有屏的播放设备。
 
 ![AIUIPlayer单设备](pictures/单设备.jpg)
-
 
 
 播放器模块和控制器模块也可以集成在不同设备上，例如无屏音箱集成播放器模块，对应的音箱手机客户端集成控制器模块，这种情况下控制器模块在初始化时需要指定集成播放器模块的设备的IP地址。
@@ -115,7 +112,18 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1001'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1002'
+}
+```
+
+同时根据需要支持信源的情况，加入对应的依赖：
+
+```groovy
+dependencies {
+    ......
+    implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1002'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:kugou:1002'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:qingting:1002'
 }
 ```
 
@@ -124,7 +132,7 @@ dependencies {
 ```groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1001'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1002'
 }
 ```
 
@@ -139,25 +147,31 @@ dependencies {
     player.addListener(object : PlayerListener {
         override fun onPlayerReady() {
             titleTxt.text = "初始化成功"
-          	//开始播放音频资源
             startPlaySamples()
         }
 
         override fun onStateChange(state: PlayState) {
+            playState.text = state.name
             when (state) {
                 PlayState.PLAYING -> ToggleBtn.text = "暂停"
-                PlayState.PAUSED -> ToggleBtn.text = "继续"
+                PlayState.PAUSED,PlayState.COMPLETE -> ToggleBtn.text = "继续"
+                else -> {}
             }
         }
 
-        override fun onMediaChange(item: MetaInfo) {
+        override fun onMediaChange(item: MetaItem) {
             //根据播放项变化回调修改title内容
             titleTxt.text = item.title
+        }
+
+        override fun onError(error: Int, info: String) {
+            titleTxt.text = "播放错误 $error $info"
         }
 
         override fun onPlayerRelease() {
             titleTxt.text = "未初始化"
         }
+
     })
 
     initializeBtn.setOnClickListener {
