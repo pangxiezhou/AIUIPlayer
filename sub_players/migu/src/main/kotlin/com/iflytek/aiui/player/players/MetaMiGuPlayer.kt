@@ -1,14 +1,16 @@
 package com.iflytek.aiui.player.players
 
 import android.content.Context
+import android.content.Intent
 import com.iflytek.aiui.player.common.player.AbstractMediaPlayer
 import com.iflytek.aiui.player.common.player.MetaItem
 import com.iflytek.aiui.player.common.player.URLRetrieveCallback
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.storage.Storage
 import com.sitech.migurun.bean.MusicInfo
-import com.sitech.migurun.init.MiGuRun
+import com.sitech.migurun.interfaces.Keys
 import com.sitech.migurun.net.MusicInfoProvider
+import com.sitech.migurun.service.AudioPlayService
 import java.lang.Exception
 
 
@@ -22,12 +24,12 @@ class MiGuAPI {
             MiGuPlayerNative.initMiGu(context)
             mMusicProvider = MusicInfoProvider(context)
 
-//            val intentService = Intent(context, AudioPlayService::class.java)
-//            //播放模式，默认顺序播放
-//            intentService.putExtra(Keys.CURRENT_PLAY_MODE, 1)
-//            //初始化要播放的音乐起始位置（第一首）
-//            intentService.putExtra(Keys. songPosition, 0)
-//            context.startService(intentService);
+            val intentService = Intent(context, AudioPlayService::class.java)
+            //播放模式，默认顺序播放
+            intentService.putExtra(Keys.CURRENT_PLAY_MODE, 1)
+            //初始化要播放的音乐起始位置（第一首）
+            intentService.putExtra(Keys. songPosition, 0)
+            context.startService(intentService)
         } catch (e: Exception) {
             e.printStackTrace()
         }
