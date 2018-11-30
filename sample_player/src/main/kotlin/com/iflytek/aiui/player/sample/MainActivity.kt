@@ -2,6 +2,7 @@ package com.iflytek.aiui.player.sample
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.SeekBar
 import android.widget.Toast
 import com.iflytek.aiui.aiuiplayer.R
 import com.iflytek.aiui.player.core.AIUIPlayer
@@ -11,6 +12,8 @@ import com.iflytek.aiui.player.core.PlayerListener
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.*
+import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
     private lateinit var player: AIUIPlayer
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStateChange(state: PlayState) {
+                playState.text = state.name
                 when (state) {
                     PlayState.PLAYING -> ToggleBtn.text = "暂停"
                     PlayState.PAUSED,PlayState.COMPLETE -> ToggleBtn.text = "继续"
@@ -77,7 +81,39 @@ class MainActivity : AppCompatActivity() {
                 player.resume()
             }
         }
+
+        playSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, process: Int, user: Boolean) {
+                if(user) {
+                    player.seekTo((player.duration * (process / 100.0)).toInt())
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+
+        })
+
+        Timer().schedule(0, 100){
+            if(player.currentState == PlayState.PLAYING) {
+                runOnUiThread {
+                    playSeek.progress = (player.currentPosition * 1.0 / player.duration* 100).toInt()
+                    playProgress.text = "${toHumanRead(player.currentPosition)}/${toHumanRead(player.duration)}"
+                }
+            }
+        }
     }
+
+    private fun toHumanRead(msec: Int): String {
+        val minute = msec / 1000 / 60
+        val seconds = msec / 1000 % 60
+        return "${minute.format(2)}:${seconds.format(2)}"
+    }
+
+    fun Int.format(digits: Int) = String.format("%0${digits}d", this)
 
     private fun startPlaySamples() {
 //        player.play(JSONArray(listOf(
@@ -117,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                 JSONObject(hashMapOf(
                         "songname" to "她说",
                         "singernames" to listOf("林俊杰"),
-                        "audiopath" to "http://vbox.hf.openstorage.cn/ctimusic/128/2015-07-21/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E5%A5%B9%E8%AF%B4%20%E6%A6%82%E5%BF%B5%E8%87%AA%E9%80%89%E8%BE%91/%E5%A5%B9%E8%AF%B4.mp3"
+                        "audiopath" to "http://open.ls.qingting.fm/live/386/24k.m3u8"
                 )),
                 JSONObject(hashMapOf(
                         "source" to "kugou",
