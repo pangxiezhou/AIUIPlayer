@@ -1,5 +1,6 @@
 @echo off
 
+
 chcp 65001
 
 git branch | find "* master" > NUL & IF ERRORLEVEL 1 (
@@ -26,10 +27,18 @@ git branch | find "* master" > NUL & IF ERRORLEVEL 1 (
 	)
 	git checkout -b github
 	
-	echo 3. 删除敏感文件
-	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch doc" --prune-empty --tag-name-filter cat
-	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/src/main/cpp" --prune-empty --tag-name-filter cat
-	git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/CMakeLists.txt" --prune-empty --tag-name-filter cat
+    echo 3. 清除冗余文件
+    # 清除原始SDK包
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch doc" --prune-empty --tag-name-filter cat
+    # 清除底层冗余代码
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/src/main/cpp" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch thirdparty-players/CMakeLists.txt" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/kugou/src/main/cpp" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/kugou/CMakeLists.txt" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/migu/src/main/cpp" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/migu/CMakeLists.txt" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/qingting/src/main/cpp" --prune-empty --tag-name-filter cat
+    git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch sub_players/qingting/CMakeLists.txt" --prune-empty --tag-name-filter cat
 
 	echo 4. 添加github remote
 	git remote | find "github_origin" > NUL & IF ERRORLEVEL 0 (
