@@ -26,6 +26,9 @@ else
                 git checkout -b github
                 
                 echo "3. 清除冗余文件"
+                #清除上传脚本
+                git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch upload_github.bat" --prune-empty --tag-name-filter cat
+                git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch upload_github.sh" --prune-empty --tag-name-filter cat
                 # 清除原始SDK包
                 git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch doc" --prune-empty --tag-name-filter cat
                 # 清除底层冗余代码
