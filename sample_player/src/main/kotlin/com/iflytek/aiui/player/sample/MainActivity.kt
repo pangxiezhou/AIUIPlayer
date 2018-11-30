@@ -116,23 +116,23 @@ class MainActivity : AppCompatActivity() {
     fun Int.format(digits: Int) = String.format("%0${digits}d", this)
 
     private fun startPlaySamples() {
-        player.play(JSONArray(listOf(
-                JSONObject(hashMapOf(
-                        "source" to "qingtingfm",
-                        "name" to "三只骄傲的小猫",
-                        "resourceId" to "192838,9290559"
-                )),
-                JSONObject(hashMapOf(
-                        "name" to "河马当保姆",
-                        "playUrl" to "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214"
-                )),
-                JSONObject(hashMapOf(
-                        "source" to "qingtingfm",
-                        "name" to "图图的生日礼物",
-                        "resourceId" to "238643,8493379"
-                ))
-        )
-        ), "story")
+//        player.play(JSONArray(listOf(
+//                JSONObject(hashMapOf(
+//                        "source" to "qingtingfm",
+//                        "name" to "三只骄傲的小猫",
+//                        "resourceId" to "192838,9290559"
+//                )),
+//                JSONObject(hashMapOf(
+//                        "name" to "河马当保姆",
+//                        "playUrl" to "http://od.open.qingting.fm/vod/00/00/0000000000000000000025449186_24.m4a?u=786&channelId=97894&programId=2588214"
+//                )),
+//                JSONObject(hashMapOf(
+//                        "source" to "qingtingfm",
+//                        "name" to "图图的生日礼物",
+//                        "resourceId" to "238643,8493379"
+//                ))
+//        )
+//        ), "story")
 
 //        player.play(JSONArray(listOf(
 //                JSONObject(hashMapOf(
@@ -149,25 +149,43 @@ class MainActivity : AppCompatActivity() {
 //        ), "radio")
 
 
-//        player.play(JSONArray(listOf(
-//                JSONObject(hashMapOf(
-//                        "songname" to "她说",
-//                        "singernames" to listOf("林俊杰"),
-//                        "audiopath" to "http://vbox.hf.openstorage.cn/ctimusic/128/2015-07-21/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E5%A5%B9%E8%AF%B4%20%E6%A6%82%E5%BF%B5%E8%87%AA%E9%80%89%E8%BE%91/%E5%A5%B9%E8%AF%B4.mp3"
-//                )),
-//                JSONObject(hashMapOf(
-//                        "source" to "kugou",
-//                        "songname" to "尽头",
-//                        "singernames" to listOf("赵方婧"),
-//                        "itemid" to "73f211b375593a4332bb5e4a28602c61"
-//                )),
-//                JSONObject(hashMapOf(
-//                        "source" to "kugou",
-//                        "songname" to "广东爱情故事",
-//                        "singernames" to listOf("广东雨神"),
-//                        "itemid" to "2a25aaff4b6c84b859b4d77f944de57a"
-//                ))
-//        )
-//        ), "musicX")
+        player.play(JSONArray(listOf(
+                JSONObject(hashMapOf(
+                        "songname" to "她说",
+                        "singernames" to listOf("林俊杰"),
+                        "audiopath" to "http://vbox.hf.openstorage.cn/ctimusic/128/2015-07-21/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E5%A5%B9%E8%AF%B4%20%E6%A6%82%E5%BF%B5%E8%87%AA%E9%80%89%E8%BE%91/%E5%A5%B9%E8%AF%B4.mp3"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "migu",
+                        "songname" to "屋顶(2018中国好声音澳门演唱会)",
+                        "singernames" to listOf("周杰伦"),
+                        "itemid" to "6990539Z1T4"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "migu",
+                        "songname" to "夜曲",
+                        "singernames" to listOf("周杰伦"),
+                        "itemid" to "60054701947"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "migu",
+                        "songname" to "七里香",
+                        "singernames" to listOf("周杰伦"),
+                        "itemid" to "60054701934"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "kugou",
+                        "songname" to "尽头",
+                        "singernames" to listOf("赵方婧"),
+                        "itemid" to "73f211b375593a4332bb5e4a28602c61"
+                )),
+                JSONObject(hashMapOf(
+                        "source" to "kugou",
+                        "songname" to "广东爱情故事",
+                        "singernames" to listOf("广东雨神"),
+                        "itemid" to "2a25aaff4b6c84b859b4d77f944de57a"
+                ))
+        )
+        ), "musicX")
     }
 }
