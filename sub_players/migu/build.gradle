@@ -28,6 +28,13 @@ android {
         test.java.srcDirs += 'src/test/kotlin'
     }
 
+    if(!file("src/main/jniLibs_gen").exists()) {
+        externalNativeBuild {
+            cmake {
+                path 'CMakeLists.txt'
+            }
+        }
+    }
 }
 
 dependencies {
