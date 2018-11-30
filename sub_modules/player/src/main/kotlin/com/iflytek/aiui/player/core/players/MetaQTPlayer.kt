@@ -147,4 +147,16 @@ class MetaQTPlayer(context: Context, rpc: RPC) : MetaAbstractPlayer(rpc) {
 
         return false
     }
+
+    override fun getDuration(): Int {
+        return player?.duration ?: 0
+    }
+
+    override fun getCurrentPos(): Int {
+        return player?.position?: 0
+    }
+
+    override fun seekTo(msec: Int) {
+        player?.seekTo(msec)
+    }
 }

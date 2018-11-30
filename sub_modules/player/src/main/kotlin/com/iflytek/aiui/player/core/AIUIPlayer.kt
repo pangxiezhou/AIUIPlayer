@@ -47,7 +47,7 @@ enum class PlayState {
     /**
      * 错误状态，需调用reset，重新进入READY状态
      */
-    ERROR
+    ERROR;
 }
 
 /**
@@ -208,6 +208,14 @@ class AIUIPlayer(context: Context) {
     //当前播放状态
     val currentState
         get() = mState
+
+
+    val duration: Int
+        get() = mActivePlayer?.getDuration() ?: 0
+
+
+    val currentPosition
+        get() = mActivePlayer?.getCurrentPos() ?: 0
 
     /**
      * 初始化，在构造完成后立即调用
@@ -380,6 +388,11 @@ class AIUIPlayer(context: Context) {
 
             else -> {}
         }
+    }
+
+
+    fun seekTo(msec: Int) {
+        mActivePlayer?.seekTo(msec)
     }
 
     /**

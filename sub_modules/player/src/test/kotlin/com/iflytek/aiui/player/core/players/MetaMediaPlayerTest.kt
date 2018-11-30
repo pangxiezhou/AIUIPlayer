@@ -132,6 +132,44 @@ class MetaMediaPlayerTest {
     }
 
     @Test
+    fun duration() {
+        //非播放状态，返回0
+        whenever(mediaPlayer.duration).thenReturn(42)
+        assertEquals(player.getDuration(), 0)
+
+        player.play(validItem)
+        assertEquals(player.getDuration(), 42)
+
+        //直播流返回-1
+        whenever(mediaPlayer.duration).thenReturn(-1)
+        assertEquals(player.getDuration(), -1)
+    }
+
+    @Test
+    fun progress() {
+        //非播放状态下调用，返回0
+        whenever(mediaPlayer.currentPosition).thenReturn(42)
+        assertEquals(player.getCurrentPos(), 0)
+
+        player.play(validItem)
+        assertEquals(player.getCurrentPos(), 42)
+    }
+
+    @Test
+    fun seek() {
+        doNothing().whenever(mediaPlayer).seekTo(any())
+
+        player.seekTo(100)
+        verify(mediaPlayer, never()).seekTo(any())
+
+        player.play(validItem)
+        player.seekTo(100)
+        verify(mediaPlayer).seekTo(100)
+    }
+
+
+
+    @Test
     fun complete() {
         player.play(validItem)
 
