@@ -107,6 +107,24 @@ abstract class MetaAbstractPlayer(protected val rpc: RPC) {
     abstract fun resume()
 
     /**
+     * 当前播放项时长
+     * (直播流返回 -1）
+     * @return 播放项时长（单位：毫秒 milliseconds）
+     */
+    abstract fun getDuration(): Int
+
+    /**
+     * 当前播放进度
+     * @return 播放项进度信息（单位：毫秒 milliseconds）
+     */
+    abstract fun getCurrentPos(): Int
+
+    /**
+     * 播放位置选择
+     */
+    abstract fun seekTo(msec: Int)
+
+    /**
      * 销毁播放器，进入IDLE状态，需要重新调用initialize接口
      */
     @CallSuper
