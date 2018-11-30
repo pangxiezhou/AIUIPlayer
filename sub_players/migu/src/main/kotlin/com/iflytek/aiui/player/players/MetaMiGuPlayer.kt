@@ -24,12 +24,12 @@ class MiGuAPI {
             MiGuPlayerNative.initMiGu(context)
             mMusicProvider = MusicInfoProvider(context)
 
-            val intentService = Intent(context, AudioPlayService::class.java)
-            //播放模式，默认顺序播放
-            intentService.putExtra(Keys.CURRENT_PLAY_MODE, 1)
-            //初始化要播放的音乐起始位置（第一首）
-            intentService.putExtra(Keys. songPosition, 0)
-            context.startService(intentService)
+//            val intentService = Intent(context, AudioPlayService::class.java)
+//            //播放模式，默认顺序播放
+//            intentService.putExtra(Keys.CURRENT_PLAY_MODE, 1)
+//            //初始化要播放的音乐起始位置（第一首）
+//            intentService.putExtra(Keys. songPosition, 0)
+//            context.startService(intentService)
         } catch (e: Exception) {
             e.printStackTrace()
         }
