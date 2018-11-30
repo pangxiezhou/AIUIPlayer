@@ -84,5 +84,18 @@ abstract class AbstractMediaPlayer(rpc: RPC): MetaAbstractPlayer(rpc) {
         super.release()
     }
 
+    override fun getDuration(): Int {
+        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.duration else 0
+    }
+
+    override fun getCurrentPos(): Int {
+        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.currentPosition else 0
+    }
+
+    override fun seekTo(msec: Int) {
+        if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.seekTo(msec)
+
+    }
+
     abstract fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback)
 }
