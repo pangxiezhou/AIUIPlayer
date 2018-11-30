@@ -1,4 +1,4 @@
-<manifest package="com.iflytek.aiui.player_init"
+<manifest package="com.iflytek.aiui.player.migu"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 网络权限 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
