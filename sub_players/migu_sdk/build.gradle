@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('migumusic-1.1.0.201807060926.aar'))
