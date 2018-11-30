@@ -113,7 +113,7 @@ class AIUIPlayer(context: Context) {
         mPlayers = mutableListOf(MetaMediaPlayer(context, rpcServer, mStorage))
         //反射初始化可能配置的子播放器
         val prefix = "com.iflytek.aiui.player.players"
-        val players = listOf("$prefix.MetaKGPlayer", "$prefix.MetaQTPlayer")
+        val players = listOf("$prefix.MetaKGPlayer", "$prefix.MetaQTPlayer", "$prefix.MetaMiGuPlayer")
         players.forEach {
             try {
                 val playerClass = Class.forName(it).kotlin

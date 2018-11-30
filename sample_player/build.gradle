@@ -57,5 +57,6 @@ dependencies {
     implementation project(':player')
     implementation project(':kugou')
     implementation project(':qingting')
+    implementation project(':migu')
 //    implementation "com.github.pangxiezhou.AIUIPlayer:player:$sdk_version"
 }
