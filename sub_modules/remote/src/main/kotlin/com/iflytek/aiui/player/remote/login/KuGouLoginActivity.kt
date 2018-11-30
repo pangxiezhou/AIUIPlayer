@@ -17,7 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.iflytek.aiui.player.remote.PlayerRemote
 import com.iflytek.aiui.player.common.rpc.method.TokenReq
-import com.iflytek.aiui.player.init.ThirdPartyPlayers
+import com.iflytek.aiui.player.players.KuGouPlayerNative
 
 import com.iflytek.aiui.player_auth.R
 import com.kugou.kgmusicsdk.IKGMusicHttpResp
@@ -41,7 +41,7 @@ class KuGouLoginActivity : AppCompatActivity() {
 
         tokenReq = intent.getParcelableExtra("request")
 
-        ThirdPartyPlayers.initKuGouMusic()
+        KuGouPlayerNative.initKuGouMusic()
 
         setContentView(R.layout.activity_kugou_login)
         sms_code.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->

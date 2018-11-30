@@ -2,15 +2,13 @@ package com.iflytek.aiui.player.core
 
 import android.content.Context
 import android.os.Handler
-import android.text.TextUtils
-import com.iflytek.aiui.player.common.rpc.RPC
-import com.iflytek.aiui.player.common.rpc.RPCListener
+import com.iflytek.aiui.player.common.player.*
+import com.iflytek.aiui.player.common.rpc.*
 import com.iflytek.aiui.player.common.rpc.connection.DataConnection
 import com.iflytek.aiui.player.common.rpc.connection.impl.WebSocketServerConnection
 import com.iflytek.aiui.player.common.storage.Storage
-import com.iflytek.aiui.player.core.players.*
 import org.json.JSONArray
-import org.json.JSONObject
+import kotlin.reflect.full.primaryConstructor
 
 /**
  * 播放器状态
@@ -50,89 +48,6 @@ enum class PlayState {
     ERROR;
 }
 
-/**
- * 播放器可接受的播放项
- */
-data class MetaItem(val info: JSONObject, val service: String) {
-    val source: String = info.optString("source")
-    val title: String
-    val author: String
-    val url: String
-
-    init {
-        val contentType = info.optInt("type", -1)
-        when (contentType) {
-            1 -> {
-                url = info.optString("url")
-                var tempTitle = info.optString("title")
-                if (TextUtils.isEmpty(tempTitle)) {
-                    tempTitle = info.optString("name")
-                }
-                title = tempTitle
-                author = ""
-            }
-
-            -1 -> {
-                when (service) {
-                    "joke" -> {
-                        title = info.optString("title")
-                        url = info.optString("mp3Url")
-                        author = ""
-                    }
-
-                    "radio" -> {
-                        title = info.optString("name")
-                        url = info.optString("url")
-                        author = ""
-                    }
-
-                    "musicX" -> {
-                        title = info.optString("songname")
-                        url = info.optString("audiopath")
-                        val singers = mutableListOf<String>()
-                        val singersJSONArray = info.optJSONArray("singernames")
-                        for (i in 0 until singersJSONArray.length()) {
-                            singers.add(singersJSONArray.optString(i))
-                        }
-                        author = singers.joinToString(",")
-                    }
-
-                    "story" -> {
-                        title = info.optString("name")
-                        url = info.optString("playUrl")
-                        author = ""
-                    }
-
-                    else -> {
-                        title = ""
-                        author = ""
-                        url = ""
-                    }
-                }
-
-            }
-
-            else -> {
-                title = ""
-                author = ""
-                url = ""
-            }
-        }
-    }
-
-
-    override fun equals(other: Any?): Boolean {
-        return if (other is MetaItem) {
-            info == other.info && service == other.service
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return info.hashCode() + service.hashCode();
-    }
-}
 
 /**
  * AIUIPlayer 播放监听器
@@ -179,7 +94,7 @@ class AIUIPlayer(context: Context) {
         }
     })
     private var mStorage = Storage(context)
-    private var mPlayers = listOf(MetaQTPlayer(context, rpcServer), MetaMediaPlayer(rpcServer), MetaKGPlayer(rpcServer, mStorage))
+    private var mPlayers: MutableList<MetaAbstractPlayer>
     private var mActivePlayer: MetaAbstractPlayer? = null
     private val mListeners = mutableListOf<PlayerListener>()
     //默认初始化状态
@@ -193,6 +108,22 @@ class AIUIPlayer(context: Context) {
     //Ready标记保存，Listener的注册可能在Ready之后，保证状态回调正常
     private var mReadyCount = 0
     private var mAutoSkipError = true
+
+    init {
+        mPlayers = mutableListOf(MetaMediaPlayer(context, rpcServer, mStorage))
+        //反射初始化可能配置的子播放器
+        val prefix = "com.iflytek.aiui.player.players"
+        val players = listOf("$prefix.MetaKGPlayer", "$prefix.MetaQTPlayer")
+        players.forEach {
+            try {
+                val playerClass = Class.forName(it).kotlin
+                val player = playerClass.primaryConstructor?.call(context, rpcServer, mStorage)
+                player?.let { mPlayers.add(player as MetaAbstractPlayer) }
+            } catch (exception: ClassNotFoundException) {
+                //player dependency not configure just ignore
+            }
+        }
+    }
 
 
     //当前播放项内容
