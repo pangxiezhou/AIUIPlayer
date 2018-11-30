@@ -112,7 +112,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1002'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1003'
 }
 ```
 
@@ -121,9 +121,9 @@ dependencies {
 ```groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1002'
-    implementation 'com.github.pangxiezhou.AIUIPlayer:kugou:1002'
-    implementation 'com.github.pangxiezhou.AIUIPlayer:qingting:1002'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1003'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:kugou:1003'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:qingting:1003'
 }
 ```
 
@@ -132,7 +132,7 @@ dependencies {
 ```groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1002'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1003'
 }
 ```
 
