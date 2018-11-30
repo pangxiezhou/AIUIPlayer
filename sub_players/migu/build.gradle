@@ -26,6 +26,8 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
+
+        main.jniLibs.srcDirs += 'src/main/jniLibs_gen'
     }
 
     if(!file("src/main/jniLibs_gen").exists()) {
@@ -41,7 +43,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':common')
-    implementation project(':migu_sdk')
 
     implementation 'com.zhy:okhttputils:2.6.2'
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4'
