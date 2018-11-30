@@ -19,7 +19,7 @@ class MiGuAPI {
     fun init(context: Context) {
         mContext = context
         try{
-            MiGuRun(context, "", "", "", "dbb6d32a813c64ca")
+            MiGuPlayerNative.initMiGu(context)
             mMusicProvider = MusicInfoProvider(context)
 
 //            val intentService = Intent(context, AudioPlayService::class.java)
