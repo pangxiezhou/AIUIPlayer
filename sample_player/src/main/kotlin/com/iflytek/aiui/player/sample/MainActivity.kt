@@ -34,6 +34,10 @@ class MainActivity : AppCompatActivity() {
                 when (state) {
                     PlayState.PLAYING -> ToggleBtn.text = "暂停"
                     PlayState.PAUSED,PlayState.COMPLETE -> ToggleBtn.text = "继续"
+                    PlayState.LOADING -> {
+                        playSeek.progress = 0
+                        playProgress.text = "--/--"
+                    }
                     else -> {}
                 }
             }
