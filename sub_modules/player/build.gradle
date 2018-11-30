@@ -31,10 +31,11 @@ android {
 }
 
 dependencies {
+    api project(':common')
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation project(':thirdparty-players')
-    implementation project(':common')
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'

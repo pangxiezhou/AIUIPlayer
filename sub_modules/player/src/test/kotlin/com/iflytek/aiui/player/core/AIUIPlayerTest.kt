@@ -3,7 +3,7 @@ package com.iflytek.aiui.player.core
 import android.content.Context
 import android.os.Handler
 import com.iflytek.aiui.player.common.error.ErrorDef
-import com.iflytek.aiui.player.core.players.*
+import com.iflytek.aiui.player.common.player.*
 import com.nhaarman.mockitokotlin2.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,8 +23,8 @@ class AIUIPlayerTest {
 
     private lateinit var qtPlayerListener: MetaListener
     private lateinit var mediaPlayerListener: MetaListener
-    private val qtPlayer: MetaQTPlayer = mock()
-    private val mediaPlayer: MetaMediaPlayer = mock()
+    private val qtPlayer: MetaAbstractPlayer = mock()
+    private val mediaPlayer: MetaAbstractPlayer = mock()
 
     @Mock
     private lateinit var mainHandler: Handler
