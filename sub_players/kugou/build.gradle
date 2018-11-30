@@ -45,6 +45,8 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
 
+    api 'com.squareup.okhttp3:okhttp:3.6.0'
+    api 'com.google.code.gson:gson:2.8.5'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20150729'
