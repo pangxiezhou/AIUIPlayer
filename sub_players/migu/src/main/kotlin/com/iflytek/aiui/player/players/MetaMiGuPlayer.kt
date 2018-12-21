@@ -2,6 +2,8 @@ package com.iflytek.aiui.player.players
 
 import android.content.Context
 import android.content.Intent
+import android.text.TextUtils
+import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.common.player.AbstractMediaPlayer
 import com.iflytek.aiui.player.common.player.MetaItem
 import com.iflytek.aiui.player.common.player.URLRetrieveCallback
@@ -53,7 +55,11 @@ class MetaMiGuPlayer(context: Context, rpc: RPC, storage: Storage): AbstractMedi
     override fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback) {
         val itemID = item.info.optString("itemid", "")
         mMiGuAPI.queryMusicByID(itemID) { info ->
-            callback(info.listenUrl)
+            if(!TextUtils.isEmpty(info.listenUrl)) {
+                callback(info.listenUrl)
+            } else {
+                onError(ErrorDef.ERROR_MIGU_SOURCE_NOT_FOUND, "咪咕没有该歌曲版权，无法为您播放")
+            }
         }
     }
 
