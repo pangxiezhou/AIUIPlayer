@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.iflytek.aiui.player.players.**
+
+-keep class com.sitech.migurun.** { *; }
+-keep class net.sqlcipher.** { *; }
+
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn retrofit2.**
+-dontwarn me.panavtec.drawableview.**
