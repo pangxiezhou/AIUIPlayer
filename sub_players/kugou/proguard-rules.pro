@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontwarn okio.**
+
+-keep class com.iflytek.aiui.player.players.** { *; }
+-keep class com.kugou.common.player.kugouplayer.** { *; }
+-keep class com.kugou.common.utils.** { *; }
+-keep class com.kugou.kgmusicsdk.KGMusicSDK { *; }
