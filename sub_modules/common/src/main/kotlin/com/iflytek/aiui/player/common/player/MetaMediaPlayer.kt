@@ -1,6 +1,7 @@
 package com.iflytek.aiui.player.common.player
 
 import android.content.Context
+import android.text.TextUtils
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.storage.Storage
 
@@ -11,11 +12,9 @@ class MetaMediaPlayer(context: Context, rpc: RPC, storage: Storage): AbstractMed
     }
 
     override fun canDispose(item: MetaItem): Boolean {
-        if(item.source !in listOf("qingtingfm")) {
-            val url = item.url
-            if(!url.isEmpty() && url.contains(Regex("mp3|m4a|ts|m3u8"))) {
-                return true
-            }
+        val url = item.url
+        if(!TextUtils.isEmpty(url) && url.contains(Regex("mp3|m4a|ts|m3u8"))) {
+            return true
         }
 
         return false
