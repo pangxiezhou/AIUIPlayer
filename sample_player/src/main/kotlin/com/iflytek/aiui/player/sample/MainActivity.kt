@@ -9,6 +9,7 @@ import com.iflytek.aiui.player.common.player.MetaItem
 import com.iflytek.aiui.player.core.AIUIPlayer
 import com.iflytek.aiui.player.core.PlayState
 import com.iflytek.aiui.player.core.PlayerListener
+import com.iflytek.aiui.player.players.MiGuPlayerNative
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        MiGuPlayerNative.initWith("", "", "", "dbb6d32a813c64ca")
 
         player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
