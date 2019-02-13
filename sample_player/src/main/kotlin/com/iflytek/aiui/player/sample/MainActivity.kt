@@ -1,5 +1,6 @@
 package com.iflytek.aiui.player.sample
 
+import android.Manifest
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.SeekBar
@@ -13,16 +14,32 @@ import com.iflytek.aiui.player.players.MiGuPlayerNative
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
 import org.json.JSONObject
+import pub.devrel.easypermissions.EasyPermissions
 import java.util.*
 import kotlin.concurrent.schedule
 
-class MainActivity : AppCompatActivity() {
+const val RC_PERMISSION_STORAGE_PHONE = 1
+
+class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks{
+
     private lateinit var player: AIUIPlayer
+    private val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        if(EasyPermissions.hasPermissions(this, *permissions)) {
+            initializePlayer()
+        } else {
+            EasyPermissions.requestPermissions(this, "在设备上播放咪咕音乐，需要允许存储和电话权限", RC_PERMISSION_STORAGE_PHONE, *permissions)
+        }
+    }
+
+
+    private fun initializePlayer() {
         MiGuPlayerNative.initWith("", "", "", "dbb6d32a813c64ca")
 
         player = AIUIPlayer(this)
@@ -36,12 +53,13 @@ class MainActivity : AppCompatActivity() {
                 playState.text = state.name
                 when (state) {
                     PlayState.PLAYING -> ToggleBtn.text = "暂停"
-                    PlayState.PAUSED,PlayState.COMPLETE -> ToggleBtn.text = "继续"
+                    PlayState.PAUSED, PlayState.COMPLETE -> ToggleBtn.text = "继续"
                     PlayState.LOADING -> {
                         playSeek.progress = 0
                         playProgress.text = "--/--"
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
 
@@ -89,9 +107,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        playSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        playSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, process: Int, user: Boolean) {
-                if(user) {
+                if (user) {
                     player.seekTo((player.duration * (process / 100.0)).toLong())
                 }
             }
@@ -104,13 +122,13 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        Timer().schedule(0, 100){
-            if(player.currentState == PlayState.PLAYING) {
+        Timer().schedule(0, 100) {
+            if (player.currentState == PlayState.PLAYING) {
                 runOnUiThread {
-                    if(player.duration == -1L) {
+                    if (player.duration == -1L) {
                         playProgress.text = "直播流"
                     } else {
-                        playSeek.progress = (player.currentPosition * 1.0 / player.duration* 100).toInt()
+                        playSeek.progress = (player.currentPosition * 1.0 / player.duration * 100).toInt()
                         playProgress.text = "${toHumanRead(player.currentPosition)}/${toHumanRead(player.duration)}"
                     }
                 }
@@ -161,9 +179,9 @@ class MainActivity : AppCompatActivity() {
 
         player.play(JSONArray(listOf(
                 JSONObject(hashMapOf(
-                        "songname" to "她说",
+                        "songname" to "美人鱼",
                         "singernames" to listOf("林俊杰"),
-                        "audiopath" to "http://vbox.hf.openstorage.cn/ctimusic/128/2015-07-21/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E5%A5%B9%E8%AF%B4%20%E6%A6%82%E5%BF%B5%E8%87%AA%E9%80%89%E8%BE%91/%E5%A5%B9%E8%AF%B4.mp3"
+                        "audiopath" to "http://aiui.storage.iflyresearch.com/ctimusic/128/2016-01-17/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E3%80%8A%E7%AC%AC%E4%BA%8C%E5%A4%A9%E5%A0%82%28%E6%B1%9F%E5%8D%97%29%E3%80%8B/%E7%BE%8E%E4%BA%BA%E9%B1%BC1452984342.mp3"
                 )),
                 JSONObject(hashMapOf(
                         "songname" to "中国人民广播电台",
@@ -190,5 +208,26 @@ class MainActivity : AppCompatActivity() {
                 ))
         )
         ), "musicX")
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if(EasyPermissions.hasPermissions(this, *permissions)) {
+            initializePlayer()
+        } else {
+            Toast.makeText(this, "请允许咪咕音乐运行时需要的权限", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        if(EasyPermissions.hasPermissions(this, *permissions)) {
+            initializePlayer()
+        } else {
+            Toast.makeText(this, "请允许咪咕音乐运行时需要的权限", Toast.LENGTH_LONG).show()
+        }
     }
 }
