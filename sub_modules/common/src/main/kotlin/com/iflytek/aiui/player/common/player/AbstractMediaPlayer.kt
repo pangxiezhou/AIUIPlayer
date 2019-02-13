@@ -24,6 +24,7 @@ typealias URLRetrieveCallback = (String) -> Unit
 
 
 abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage): MetaAbstractPlayer(context, rpc, storage) {
+    @Volatile private var mCurrentItem: MetaItem? = null
     private lateinit var mMediaPlayer:ExoPlayer
     private var mInitializer: MediaPlayerInitializer = { context, callback->
         callback(ExoPlayerFactory.newSimpleInstance(context))
@@ -36,22 +37,18 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
             mMediaPlayer.playWhenReady = true
             mMediaPlayer.addListener(object: Player.EventListener {
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                    Timber.d("playWhenReady: $playWhenReady state $playbackState")
                     when(playbackState) {
                         Player.STATE_ENDED -> {
                             stateChange(MetaState.COMPLETE)
                         }
 
                         Player.STATE_READY -> {
-                           if(playWhenReady)  {
+                           if(state() == MetaState.LOADING && playWhenReady) {
                                stateChange(MetaState.PLAYING)
-                           } else {
-                               stateChange(MetaState.PAUSED)
                            }
                         }
                     }
                 }
-
 
                 override fun onPlayerError(error: ExoPlaybackException?) {
                     onError(ErrorDef.ERROR_MEDIA_PLAYER_ERROR, "ExoPlayer Error $error")
@@ -64,22 +61,34 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
     }
 
     override fun play(item: MetaItem) {
+        Timber.d("$this play ${item.title}")
+        mCurrentItem = item
+        mMediaPlayer.stop(true)
         stateChange(MetaState.LOADING)
-        retrieveURL(item) {
-            mMediaPlayer.prepare(ExtractorMediaSource.Factory(buildDataSourceFactory(context)).createMediaSource(Uri.parse(it)))
-            mMediaPlayer.playWhenReady = true
+
+        retrieveURL(item) { url ->
+            //避免URL回调时已不是当前项目
+            if(item == mCurrentItem) {
+                mMediaPlayer.prepare(ExtractorMediaSource.Factory(buildDataSourceFactory(context)).createMediaSource(Uri.parse(url)))
+                //避免URL回调时已不是播放状态
+                if(state() != MetaState.PAUSED) {
+                    mMediaPlayer.playWhenReady = true
+                }
+            }
         }
     }
 
     override fun pause() {
-       if(state() == MetaState.PLAYING) {
+       if(state() == MetaState.PLAYING || state() == MetaState.LOADING) {
             mMediaPlayer.playWhenReady = false
+            stateChange(MetaState.PAUSED)
        }
     }
 
     override fun resume() {
-        if(state() != MetaState.PLAYING) {
+        if(state() == MetaState.PAUSED || state() == MetaState.LOADING) {
             mMediaPlayer.playWhenReady = true
+            stateChange(MetaState.PLAYING)
         }
     }
 
