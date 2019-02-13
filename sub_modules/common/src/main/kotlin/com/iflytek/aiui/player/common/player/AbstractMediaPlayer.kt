@@ -2,15 +2,14 @@ package com.iflytek.aiui.player.common.player
 
 import android.content.Context
 import android.net.Uri
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory
 import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.upstream.cache.*
 import com.google.android.exoplayer2.util.Util
-import com.iflytek.aiui.player.common.BuildConfig
 import com.iflytek.aiui.player.common.error.ErrorDef
 import com.iflytek.aiui.player.common.rpc.RPC
 import com.iflytek.aiui.player.common.storage.Storage
@@ -26,6 +25,7 @@ typealias URLRetrieveCallback = (String) -> Unit
 abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage): MetaAbstractPlayer(context, rpc, storage) {
     @Volatile private var mCurrentItem: MetaItem? = null
     private lateinit var mMediaPlayer:ExoPlayer
+    private var mIsLiveStream = false
     private var mInitializer: MediaPlayerInitializer = { context, callback->
         callback(ExoPlayerFactory.newSimpleInstance(context))
     }
@@ -69,7 +69,23 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
         retrieveURL(item) { url ->
             //避免URL回调时已不是当前项目
             if(item == mCurrentItem) {
-                mMediaPlayer.prepare(ExtractorMediaSource.Factory(buildDataSourceFactory(context)).createMediaSource(Uri.parse(url)))
+                val uri = Uri.parse(url)
+                val type = Util.inferContentType(uri)
+                when(type) {
+                    C.TYPE_HLS -> {
+                        val  factory = HlsMediaSource.Factory(DefaultDataSourceFactory(context, "AIUIPlayer"))
+                        //忽略Ts文件中的h264 stream
+                        factory.setExtractorFactory(DefaultHlsExtractorFactory(DefaultTsPayloadReaderFactory.FLAG_IGNORE_H264_STREAM))
+                        mMediaPlayer.prepare(factory.createMediaSource(uri))
+                        mIsLiveStream = true
+                    }
+
+                    else -> {
+                        mMediaPlayer.prepare(ExtractorMediaSource.Factory(buildCacheDataFactory(context)).createMediaSource(uri))
+                        mIsLiveStream = false
+                    }
+                }
+
                 //避免URL回调时已不是播放状态
                 if(state() != MetaState.PAUSED) {
                     mMediaPlayer.playWhenReady = true
@@ -99,24 +115,23 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
     }
 
     override fun getDuration(): Long {
-        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.duration else 0
+        return if(mIsLiveStream) {
+            -1
+        } else {
+            if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.duration else 0
+        }
     }
 
     override fun getCurrentPos(): Long {
-        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.currentPosition else 0
+        return if(mIsLiveStream) {
+            -1
+        } else {
+            if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.currentPosition else 0
+        }
     }
 
     override fun seekTo(msec: Long) {
         if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.seekTo(msec)
-
-    }
-
-    private fun buildDataSourceFactory(context: Context): DataSource.Factory {
-        val upstreamFactory = DefaultDataSourceFactory(context, DefaultHttpDataSourceFactory(Util.getUserAgent(context, "AIUIPlayer")))
-        return CacheDataSourceFactory(
-                getPlayerCache(context),
-                upstreamFactory,
-                CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }
 
     abstract fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback)
@@ -124,14 +139,18 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
     companion object {
         private const val mCacheDir = "aiui_player_cache"
         private const val mMaxCacheSize:Long = 200 * 1024 * 1014
-        private var mPlayerCache: Cache? = null
+        private var mCacheDataFactory:DataSource.Factory? = null
 
-        fun getPlayerCache(context: Context): Cache {
-            if(mPlayerCache == null)  {
-                 mPlayerCache = SimpleCache(File(context.filesDir, mCacheDir), LeastRecentlyUsedCacheEvictor(mMaxCacheSize))
+        fun buildCacheDataFactory(context: Context): DataSource.Factory {
+            if(mCacheDataFactory == null) {
+                val upstreamFactory = DefaultDataSourceFactory(context, "AIUIPlayer")
+                mCacheDataFactory = CacheDataSourceFactory(
+                        SimpleCache(File(context.filesDir, mCacheDir), LeastRecentlyUsedCacheEvictor(mMaxCacheSize)),
+                        upstreamFactory,
+                        CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
             }
 
-            return mPlayerCache!!
+            return mCacheDataFactory!!
         }
     }
 }

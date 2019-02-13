@@ -200,6 +200,7 @@ abstract class MetaAbstractPlayer(protected val context: Context, protected val 
 
     /**
      * 当前播放进度
+     * (直播流返回 -1）
      * @return 播放项进度信息（单位：毫秒 milliseconds）
      */
     abstract fun getCurrentPos(): Long

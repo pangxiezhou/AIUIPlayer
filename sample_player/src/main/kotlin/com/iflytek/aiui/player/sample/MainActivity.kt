@@ -107,8 +107,12 @@ class MainActivity : AppCompatActivity() {
         Timer().schedule(0, 100){
             if(player.currentState == PlayState.PLAYING) {
                 runOnUiThread {
-                    playSeek.progress = (player.currentPosition * 1.0 / player.duration* 100).toInt()
-                    playProgress.text = "${toHumanRead(player.currentPosition)}/${toHumanRead(player.duration)}"
+                    if(player.duration == -1L) {
+                        playProgress.text = "直播流"
+                    } else {
+                        playSeek.progress = (player.currentPosition * 1.0 / player.duration* 100).toInt()
+                        playProgress.text = "${toHumanRead(player.currentPosition)}/${toHumanRead(player.duration)}"
+                    }
                 }
             }
         }
@@ -155,12 +159,16 @@ class MainActivity : AppCompatActivity() {
 //        )
 //        ), "radio")
 
-
         player.play(JSONArray(listOf(
                 JSONObject(hashMapOf(
                         "songname" to "她说",
                         "singernames" to listOf("林俊杰"),
                         "audiopath" to "http://vbox.hf.openstorage.cn/ctimusic/128/2015-07-21/%E6%9E%97%E4%BF%8A%E6%9D%B0/%E5%A5%B9%E8%AF%B4%20%E6%A6%82%E5%BF%B5%E8%87%AA%E9%80%89%E8%BE%91/%E5%A5%B9%E8%AF%B4.mp3"
+                )),
+                JSONObject(hashMapOf(
+                        "songname" to "中国人民广播电台",
+                        "singernames" to listOf("中国人民广播电台"),
+                        "audiopath" to "http://open.ls.qingting.fm/live/386/24k.m3u8"
                 )),
                 JSONObject(hashMapOf(
                         "source" to "migu",
