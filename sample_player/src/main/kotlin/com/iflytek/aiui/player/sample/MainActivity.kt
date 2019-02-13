@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         playSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, process: Int, user: Boolean) {
                 if(user) {
-                    player.seekTo((player.duration * (process / 100.0)).toInt())
+                    player.seekTo((player.duration * (process / 100.0)).toLong())
                 }
             }
 
@@ -114,10 +114,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toHumanRead(msec: Int): String {
+    private fun toHumanRead(msec: Long): String {
         val minute = msec / 1000 / 60
         val seconds = msec / 1000 % 60
-        return "${minute.format(2)}:${seconds.format(2)}"
+        return "${minute.toInt().format(2)}:${seconds.toInt().format(2)}"
     }
 
     fun Int.format(digits: Int) = String.format("%0${digits}d", this)

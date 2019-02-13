@@ -196,18 +196,18 @@ abstract class MetaAbstractPlayer(protected val context: Context, protected val 
      * (直播流返回 -1）
      * @return 播放项时长（单位：毫秒 milliseconds）
      */
-    abstract fun getDuration(): Int
+    abstract fun getDuration(): Long
 
     /**
      * 当前播放进度
      * @return 播放项进度信息（单位：毫秒 milliseconds）
      */
-    abstract fun getCurrentPos(): Int
+    abstract fun getCurrentPos(): Long
 
     /**
      * 播放位置选择
      */
-    abstract fun seekTo(msec: Int)
+    abstract fun seekTo(msec: Long)
 
     /**
      * 销毁播放器，进入IDLE状态，需要重新调用initialize接口

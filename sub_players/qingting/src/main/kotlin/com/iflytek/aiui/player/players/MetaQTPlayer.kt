@@ -150,15 +150,15 @@ class MetaQTPlayer(context: Context, rpc: RPC, storage: Storage) : MetaAbstractP
         return false
     }
 
-    override fun getDuration(): Int {
-        return player?.duration ?: 0
+    override fun getDuration(): Long {
+        return player?.duration?.toLong() ?: 0
     }
 
-    override fun getCurrentPos(): Int {
-        return player?.position?: 0
+    override fun getCurrentPos(): Long {
+        return player?.position?.toLong() ?: 0
     }
 
-    override fun seekTo(msec: Int) {
-        player?.seekTo(msec)
+    override fun seekTo(msec: Long) {
+        player?.seekTo(msec.toInt())
     }
 }

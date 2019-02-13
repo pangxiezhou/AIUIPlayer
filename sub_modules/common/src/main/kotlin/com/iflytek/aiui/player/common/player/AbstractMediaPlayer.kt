@@ -98,16 +98,16 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
         super.release()
     }
 
-    override fun getDuration(): Int {
-        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.duration.toInt() else 0
+    override fun getDuration(): Long {
+        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.duration else 0
     }
 
-    override fun getCurrentPos(): Int {
-        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.currentPosition.toInt() else 0
+    override fun getCurrentPos(): Long {
+        return if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.currentPosition else 0
     }
 
-    override fun seekTo(msec: Int) {
-        if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.seekTo(msec.toLong())
+    override fun seekTo(msec: Long) {
+        if(state() in listOf(MetaState.PLAYING, MetaState.PAUSED)) mMediaPlayer.seekTo(msec)
 
     }
 

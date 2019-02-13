@@ -141,7 +141,7 @@ class AIUIPlayer(context: Context) {
         get() = mState
 
 
-    val duration: Int
+    val duration: Long
         get() = mActivePlayer?.getDuration() ?: 0
 
 
@@ -322,7 +322,7 @@ class AIUIPlayer(context: Context) {
     }
 
 
-    fun seekTo(msec: Int) {
+    fun seekTo(msec: Long) {
         mActivePlayer?.seekTo(msec)
     }
 
