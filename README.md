@@ -96,6 +96,10 @@ dependencies {
 #### 3.2.1 播放器接口调用示例
 
 ``` kotlin
+
+    //使用从平台申请的对应信源的标识信息进行初始化
+    MiGuPlayerNative.initWith("", "", "", "xxxxx")
+    
     player = AIUIPlayer(this)
     player.addListener(object : PlayerListener {
         override fun onPlayerReady() {
