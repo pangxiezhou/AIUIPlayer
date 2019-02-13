@@ -1,6 +1,6 @@
-String[] subModules = [':common', ':player', ':remote']
+String[] subModules = [':common', ':player']
 String[] subPlayers = [':kugou',  ':migu']
-include ':sample_player', ':sample_remote'
+include ':sample_player'
 include(subModules)
 include(subPlayers)
 
