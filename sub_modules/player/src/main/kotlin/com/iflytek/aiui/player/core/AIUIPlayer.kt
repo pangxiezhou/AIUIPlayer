@@ -406,8 +406,6 @@ class AIUIPlayer(context: Context) {
     }
 
     private fun playToNextAvailable(positive: Boolean = true): Boolean {
-        mActivePlayer?.pause()
-
         var range: IntProgression = mIndex + 1 until mData.size
         if (!positive) {
             range = mIndex - 1 downTo 0
@@ -420,6 +418,8 @@ class AIUIPlayer(context: Context) {
             }
 
             if (availablePlayer != null) {
+                mActivePlayer?.pause()
+
                 mIndex = index
                 mActivePlayer = availablePlayer
                 mActivePlayer?.play(mData[index])
@@ -428,7 +428,6 @@ class AIUIPlayer(context: Context) {
             }
         }
 
-        if (mState == PlayState.PLAYING) mActivePlayer?.resume()
         return false
     }
 
