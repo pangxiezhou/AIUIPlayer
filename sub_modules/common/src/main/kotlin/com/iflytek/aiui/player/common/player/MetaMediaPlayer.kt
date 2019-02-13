@@ -13,7 +13,7 @@ class MetaMediaPlayer(context: Context, rpc: RPC, storage: Storage): AbstractMed
 
     override fun canDispose(item: MetaItem): Boolean {
         val url = item.url
-        if(!TextUtils.isEmpty(url) && url.contains(Regex("mp3|m4a|ts|m3u8"))) {
+        if(!TextUtils.isEmpty(url)) {
             return true
         }
 
