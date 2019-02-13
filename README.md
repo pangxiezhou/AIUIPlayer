@@ -42,55 +42,25 @@ AIUIPlayer为开发者提供了统一的播放和控制接口，在内部根据�
 目前播放支持：
 
 - 咪咕音乐
-- 蜻蜓FM
-- 酷狗音乐
 - 直接URL资源
 
 
 
 ### 2.1 模块介绍
 
-
-
-    -  sample_player   // 播放器集成调用示例
-    -  sample_remote  // 控制器集成调用示例
+    -  sample_player     // 播放器集成调用示例
     -  sub_modules
           -  common      // 公共依赖
-          -  player          // 播放器library
-          - remote         //控制器library
+          -  player      // 播放器library
     - sub_players
-           - migu           // 咪咕播放器实现
-          - kugou          // 酷狗播放器实现
-          - qingting       // 蜻蜓播放器实现
-
-
-
-### 2.2 授权处理
-
-调用AIUIPlayer播放资源时，在内部调用的是第三方SDK进行实际的播放，而一些第三方SDK播放器（如酷狗）在播放前需要用户进行登录授权。
-
-通过集成控制器模块即可处理登录授权的请求。播放器模块在播放到需要授权的资源时将授权请求发送到控制器模块，控制器模块弹出对应授权界面，用户输入完成授权后将授权信息返回给播放器模块，播放器模块使用授权信息完成资源的继续播放。
-
-![player&remote](pictures/player&remote.jpg)
-
-### 2.3 集成方式
-
-播放器模块和控制器模块可以集成在一个App内，该App既负责音频播放也负责授权处理，比较适用于手机App或者有屏的播放设备。
-
-![AIUIPlayer单设备](pictures/单设备.jpg)
-
-
-播放器模块和控制器模块也可以集成在不同设备上，例如无屏音箱集成播放器模块，对应的音箱手机客户端集成控制器模块，这种情况下控制器模块在初始化时需要指定集成播放器模块的设备的IP地址。
-
-![AIUIPlayer多设备](pictures/多设备.jpg)
-
+          - migu         // 咪咕播放器实现
 
 
 ## 3. 使用
 
 ### 3.1 项目配置
 
-在顶层目录下的build.gradle中加入jitPack仓库和蜻蜓FM的maven仓库
+在顶层目录下的build.gradle中加入jitPack的maven仓库
 
 ``` groovy
 allprojects {
@@ -98,10 +68,6 @@ allprojects {
         ......
         maven {
             url uri('https://jitpack.io')
-        }
-
-        maven {
-            url uri('http://maven.qingting.fm/')
         }
     }
 }
@@ -122,21 +88,8 @@ dependencies {
 dependencies {
     ......
     implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1004'
-    implementation 'com.github.pangxiezhou.AIUIPlayer:kugou:1004'
-    implementation 'com.github.pangxiezhou.AIUIPlayer:qingting:1004'
 }
 ```
-
-如果需要集成控制器，在app下的build.gradle加入remote的依赖
-
-```groovy
-dependencies {
-    ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:remote:1004'
-}
-```
-
-
 
 ### 3.2 接口调用
 
@@ -197,15 +150,6 @@ dependencies {
 
 更详细的调用参考sample_player目录下代码示例。
 
-
-
-#### 3.2.1 remote接口调用示例
-
-```kotlin
-    PlayerRemote.init(context)
-```
-
-更详细的调用参考sample_remote目录下代码示例。
 
 
 ## 4. Player状态参考
