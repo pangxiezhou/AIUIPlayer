@@ -66,21 +66,17 @@ data class MetaItem(val info: JSONObject, val service: String) {
 
         if(TextUtils.isEmpty(url)) {
             when (contentType) {
+                //音频资源
                 1 -> {
                     _url = info.optString("url")
                     var tempTitle = info.optString("title")
                     if (TextUtils.isEmpty(tempTitle)) {
                         tempTitle = info.optString("name")
                     }
-                    _title = tempTitle
-                    _author = ""
-                }
 
-
-                else -> {
-                    _title = ""
-                    _author = ""
-                    _url = ""
+                    if(TextUtils.isEmpty(_title)) {
+                        _title = tempTitle
+                    }
                 }
             }
         }
