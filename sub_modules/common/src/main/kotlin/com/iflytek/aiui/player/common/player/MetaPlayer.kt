@@ -11,69 +11,81 @@ import org.json.JSONObject
  */
 data class MetaItem(val info: JSONObject, val service: String) {
     val source: String = info.optString("source")
-    val title: String
-    val author: String
-    val url: String
+    private var _title: String
+    private var _author: String
+    private var _url: String
+
+    val title
+        get() = _title
+
+    val author
+        get() = _author
+
+    val url
+        get() = _url
 
     init {
         val contentType = info.optInt("type", -1)
-        when (contentType) {
-            1 -> {
-                url = info.optString("url")
-                var tempTitle = info.optString("title")
-                if (TextUtils.isEmpty(tempTitle)) {
-                    tempTitle = info.optString("name")
-                }
-                title = tempTitle
-                author = ""
+        //根据技能名称兼容旧的信源格式
+        when (service) {
+            "joke" -> {
+                _title = info.optString("title")
+                _url = info.optString("mp3Url")
+                _author = ""
             }
 
-            -1 -> {
-                when (service) {
-                    "joke" -> {
-                        title = info.optString("title")
-                        url = info.optString("mp3Url")
-                        author = ""
-                    }
+            "radio" -> {
+                _title = info.optString("name")
+                _url = info.optString("url")
+                _author = ""
+            }
 
-                    "radio" -> {
-                        title = info.optString("name")
-                        url = info.optString("url")
-                        author = ""
-                    }
-
-                    "musicX" -> {
-                        title = info.optString("songname")
-                        url = info.optString("audiopath")
-                        val singers = mutableListOf<String>()
-                        val singersJSONArray = info.optJSONArray("singernames")
-                        for (i in 0 until singersJSONArray.length()) {
-                            singers.add(singersJSONArray.optString(i))
-                        }
-                        author = singers.joinToString(",")
-                    }
-
-                    "story" -> {
-                        title = info.optString("name")
-                        url = info.optString("playUrl")
-                        author = ""
-                    }
-
-                    else -> {
-                        title = ""
-                        author = ""
-                        url = ""
-                    }
+            "musicX" -> {
+                _title = info.optString("songname")
+                _url = info.optString("audiopath")
+                val singers = mutableListOf<String>()
+                val singersJSONArray = info.optJSONArray("singernames")
+                for (i in 0 until singersJSONArray.length()) {
+                    singers.add(singersJSONArray.optString(i))
                 }
+                _author = singers.joinToString(",")
+            }
 
+            "story" -> {
+                _title = info.optString("name")
+                _url = info.optString("playUrl")
+                _author = ""
             }
 
             else -> {
-                title = ""
-                author = ""
-                url = ""
+                _title = ""
+                _author = ""
+                _url = ""
             }
         }
+
+        if(TextUtils.isEmpty(url)) {
+            when (contentType) {
+                1 -> {
+                    _url = info.optString("url")
+                    var tempTitle = info.optString("title")
+                    if (TextUtils.isEmpty(tempTitle)) {
+                        tempTitle = info.optString("name")
+                    }
+                    _title = tempTitle
+                    _author = ""
+                }
+
+
+                else -> {
+                    _title = ""
+                    _author = ""
+                    _url = ""
+                }
+            }
+        }
+
+
     }
 
 
