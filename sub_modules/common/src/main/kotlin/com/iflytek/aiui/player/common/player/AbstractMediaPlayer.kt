@@ -111,56 +111,27 @@ abstract class AbstractMediaPlayer(context: Context, rpc: RPC, storage: Storage)
 
     }
 
+    private fun buildDataSourceFactory(context: Context): DataSource.Factory {
+        val upstreamFactory = DefaultDataSourceFactory(context, DefaultHttpDataSourceFactory(Util.getUserAgent(context, "AIUIPlayer")))
+        return CacheDataSourceFactory(
+                getPlayerCache(context),
+                upstreamFactory,
+                CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+    }
+
     abstract fun retrieveURL(item: MetaItem, callback: URLRetrieveCallback)
 
     companion object {
-        private val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
+        private const val mCacheDir = "aiui_player_cache"
+        private const val mMaxCacheSize:Long = 200 * 1024 * 1014
+        private var mPlayerCache: Cache? = null
 
-        private var downloadDirectory: File? = null
-        private var downloadCache: Cache? = null
-
-
-        /** Returns a [DataSource.Factory].  */
-        fun buildDataSourceFactory(context: Context): DataSource.Factory {
-            val upstreamFactory = DefaultDataSourceFactory(context, buildHttpDataSourceFactory(context))
-            return buildReadOnlyCacheDataSource(upstreamFactory, getDownloadCache(context))
-        }
-
-        /** Returns a [HttpDataSource.Factory].  */
-        fun buildHttpDataSourceFactory(context: Context): HttpDataSource.Factory {
-            return DefaultHttpDataSourceFactory(Util.getUserAgent(context, "AIUIPlayer"))
-        }
-
-        /** Returns whether extension renderers should be used.  */
-        fun useExtensionRenderers(): Boolean {
-            return "withExtensions" == BuildConfig.FLAVOR
-        }
-
-        private fun getDownloadCache(context: Context): Cache {
-            if (downloadCache == null) {
-                val downloadContentDirectory = File(getDownloadDirectory(context), DOWNLOAD_CONTENT_DIRECTORY)
-                downloadCache = SimpleCache(downloadContentDirectory, NoOpCacheEvictor())
+        fun getPlayerCache(context: Context): Cache {
+            if(mPlayerCache == null)  {
+                 mPlayerCache = SimpleCache(File(context.filesDir, mCacheDir), LeastRecentlyUsedCacheEvictor(mMaxCacheSize))
             }
-            return downloadCache!!
-        }
 
-        private fun getDownloadDirectory(context: Context): File? {
-            if (downloadDirectory == null) {
-                downloadDirectory = context.getExternalFilesDir(null)
-                if (downloadDirectory == null) {
-                    downloadDirectory = context.getFilesDir()
-                }
-            }
-            return downloadDirectory
-        }
-
-        private fun buildReadOnlyCacheDataSource(
-                upstreamFactory: DefaultDataSourceFactory, cache: Cache): CacheDataSourceFactory {
-            return CacheDataSourceFactory(
-                    cache,
-                    upstreamFactory,
-                    FileDataSourceFactory(), null,
-                    CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null)/* cacheWriteDataSinkFactory= */
+            return mPlayerCache!!
         }
     }
 }
