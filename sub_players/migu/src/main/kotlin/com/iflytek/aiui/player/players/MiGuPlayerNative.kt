@@ -18,6 +18,14 @@ class MiGuPlayerNative {
 
         }
 
+        fun initWith( deviceID: String,  channelCode: String) {
+            mUID = ""
+            mDeviceID = deviceID
+            mPhone  = ""
+            mChannelCode = channelCode
+
+        }
+
         fun initMiGu(context: Context) {
             MiGuRun(context, mUID, mDeviceID, mPhone, mChannelCode)
         }
