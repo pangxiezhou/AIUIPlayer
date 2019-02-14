@@ -1,8 +1,11 @@
 package com.iflytek.aiui.player.sample
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.TelephonyManager
 import android.widget.SeekBar
 import android.widget.Toast
 import com.iflytek.aiui.aiuiplayer.R
@@ -39,8 +42,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks{
     }
 
 
+    @SuppressLint("MissingPermission")
     private fun initializePlayer() {
-        MiGuPlayerNative.initWith("", "", "", "dbb6d32a813c64ca")
+        //使用咪咕分配的ChannelCode和根据自身业务策略生成的DeviceID进行咪咕初始化
+        MiGuPlayerNative.initWith((getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId, "dbb6d32a813c64ca")
 
         player = AIUIPlayer(this)
         player.addListener(object : PlayerListener {
