@@ -59,6 +59,4 @@ dependencies {
     implementation project(':migu')
 //    implementation "com.github.pangxiezhou.AIUIPlayer:player:$sdk_version"
 //    implementation "com.github.pangxiezhou.AIUIPlayer:migu:$sdk_version"
-//    implementation "com.github.pangxiezhou.AIUIPlayer:kugou:$sdk_version"
-//    implementation "com.github.pangxiezhou.AIUIPlayer:qingting:$sdk_version"
 }

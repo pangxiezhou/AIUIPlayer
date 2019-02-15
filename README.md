@@ -78,7 +78,7 @@ allprojects {
 ``` groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1004'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:player:1005'
 }
 ```
 
@@ -87,7 +87,7 @@ dependencies {
 ```groovy
 dependencies {
     ......
-    implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1004'
+    implementation 'com.github.pangxiezhou.AIUIPlayer:migu:1005'
 }
 ```
 
